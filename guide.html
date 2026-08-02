@@ -277,6 +277,37 @@ cout &lt;&lt; (<span class="tok-num">5</span> == <span class="tok-num">3</span>)
   </table>
   <div class="box tip"><span class="label">זכרי</span>העברה <code>by value</code> יוצרת עותק (מפעילה copy constructor) ועלולה לגרום ל-<b>slicing</b> בירושה. נחזור לזה במודול 6.</p></div>
 
+  <h4>ארבע הדרכים להעביר פרמטר (המטריצה המלאה)</h4>
+  <p>מעבר ל-by value מול by reference, המצגות מציגות ארבע חתימות אפשריות. ההבחנה: האם עובר <b>עותק</b>, והאם אפשר לשנות את <b>המקור</b> ואת <b>המצביע</b>.</p>
+  <table class="tbl">
+    <tr><th>חתימה</th><th>מה עובר</th><th>שינוי האובייקט המקורי?</th></tr>
+    <tr><td><code>f(Point x)</code></td><td>עותק של האובייקט</td><td>לא — עובדים על עותק</td></tr>
+    <tr><td><code>f(Point&amp; x)</code></td><td>האובייקט המקורי (כינוי)</td><td>כן</td></tr>
+    <tr><td><code>f(Point* x)</code></td><td><b>עותק של המצביע</b> (הכתובת)</td><td><b>כן!</b> דרך <code>x-&gt;Set(...)</code></td></tr>
+    <tr><td><code>f(Point*&amp; x)</code></td><td>המצביע המקורי עצמו</td><td>כן, וגם אפשר להפנות אותו לאובייקט אחר (reseat)</td></tr>
+  </table>
+  <div class="box trap"><span class="label">מלכודת מבחן — מצביע by value</span>
+  <code>f(Point* x)</code> מעביר <b>עותק של הכתובת</b>, אבל העותק עדיין מצביע על <b>אותו אובייקט</b> — אז <code>x-&gt;Set(9,9)</code> <b>כן</b> משנה את המקור! הטעות הנפוצה: "העברתי מצביע by value אז שום דבר לא ישתנה". זה נכון רק אם משנים את <b>המצביע עצמו</b> (<code>x = ...</code>), לא את מה שהוא מצביע עליו.</p></div>
+  <div class="box tip"><span class="label">כלל אצבע</span>העבירי אובייקטים כבדים ב-<code>const Type&amp;</code>: בלי עלות של עותק, ובלי סכנת שינוי מקרי.</p></div>
+
+  <h3>הרכבה (Composition) — שדה שהוא אובייקט</h3>
+  <p>שדה של מחלקה יכול להיות אובייקט של מחלקה אחרת. למשל <code>Rectangle</code> שמכיל שני <code>Point</code>:</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Rectangle</span> {
+    <span class="tok-type">Point</span> topLeft, bottomRight;   <span class="tok-com">// שני אובייקטים כשדות</span>
+<span class="tok-key">public</span>:
+    <span class="tok-key">void</span> <span class="tok-fn">Print</span>() { topLeft.<span class="tok-fn">Print</span>(); }  <span class="tok-com">// קוראים למתודות של השדה</span>
+};</code></pre>
+  <p>זהו יחס "יש-לו" (has-a): למלבן <b>יש</b> נקודות. כשמלבן נבנה, הבנאים של השדות (שתי הנקודות) רצים <b>לפני</b> גוף הבנאי של המלבן. נחזור להבחנה בין "יש-לו" ל"הוא-סוג-של" (ירושה) במודול 5.</p>
+
+  <h3>ארבעת עמודי ה-OOP</h3>
+  <p>שאלת ידע קלאסית — ארבעת העקרונות של תכנות מונחה עצמים:</p>
+  <table class="tbl">
+    <tr><td><b>Abstraction</b> (הפשטה)</td><td>מציגים כלפי חוץ רק את מה שחשוב, מסתירים את הפרטים</td></tr>
+    <tr><td><b>Encapsulation</b> (כימוס)</td><td>אורזים נתונים + פעולות יחד, ומגבילים גישה (<code>private</code>)</td></tr>
+    <tr><td><b>Inheritance</b> (ירושה)</td><td>מחלקה יורשת תכונות ממחלקת בסיס (מודול 5)</td></tr>
+    <tr><td><b>Polymorphism</b> (רב-צורתיות)</td><td>אותה קריאה מתנהגת אחרת לפי האובייקט האמיתי (מודול 6)</td></tr>
+  </table>
+
   <p class="maps">מכסה שאלות: 1, 2</p>
 </section>
 
@@ -323,6 +354,30 @@ cout &lt;&lt; (<span class="tok-num">5</span> == <span class="tok-num">3</span>)
     <span class="tok-fn">Polygon</span>(<span class="tok-key">int</span> n) : size(n) { array = <span class="tok-key">new</span> <span class="tok-type">Point</span>[size]; }
     ~<span class="tok-fn">Polygon</span>() { <span class="tok-key">if</span> (array != <span class="tok-num">NULL</span>) <span class="tok-key">delete</span>[] array; }  <span class="tok-com">// שחרור</span>
 };</code></pre>
+  <div class="box trap"><span class="label">מלכודת מבחן — <code>delete[]</code> מול <code>delete</code></span>
+  אם הקצית <b>מערך</b> ב-<code>new Point[size]</code>, חייבים לשחרר ב-<code>delete[]</code> (עם סוגריים). <code>delete</code> רגיל על מערך = התנהגות לא מוגדרת (רק האיבר הראשון מנוקה). הכלל: <code>new</code>→<code>delete</code>, <code>new[]</code>→<code>delete[]</code>. תמיד תואמים.</p></div>
+
+  <h3>⭐ אתחול מול השמה — אותו <code>=</code>, שתי משמעויות</h3>
+  <p>הסימן <code>=</code> יכול להפעיל <b>שתי</b> פעולות שונות לגמרי, תלוי אם האובייקט השמאלי <b>נוצר עכשיו</b> או <b>כבר קיים</b>:</p>
+  <pre><code><span class="tok-type">Polygon</span> p1(<span class="tok-num">5</span>);
+<span class="tok-type">Polygon</span> p2 = p1;   <span class="tok-com">// p2 נוצר עכשיו → בנאי העתקה (Copy Constructor)</span>
+
+<span class="tok-type">Polygon</span> p3(<span class="tok-num">3</span>);
+p3 = p1;           <span class="tok-com">// p3 כבר קיים → אופרטור השמה (operator=)</span></code></pre>
+  <div class="box key"><span class="label">איך מבדילים</span>
+  אם ה-<code>=</code> מופיע ב<b>שורת ההגדרה</b> של המשתנה (יוצרים אותו) — זה <b>בנאי העתקה</b>. אם המשתנה כבר הוגדר קודם וה-<code>=</code> בא בשורה נפרדת — זה <b>אופרטור השמה</b>. שתי פעולות שונות, למרות אותו סימן.</p></div>
+
+  <h4>מערך אובייקטים דורש בנאי ברירת מחדל</h4>
+  <p>כשיוצרים <b>מערך</b> של אובייקטים (סטטי או דינמי), C++ מפעילה על כל איבר את <b>בנאי ברירת המחדל</b> (בלי פרמטרים). לכן אם למחלקה יש רק בנאי עם פרמטרים — יצירת מערך ממנה לא מתקמפלת.</p>
+  <pre><code><span class="tok-type">Point</span> arr[<span class="tok-num">5</span>];          <span class="tok-com">// מפעיל Point() על כל אחד מ-5 → צריך בנאי ברירת מחדל</span>
+<span class="tok-type">Point</span>* p = <span class="tok-key">new</span> <span class="tok-type">Point</span>[<span class="tok-num">5</span>]; <span class="tok-com">// אותו דבר, דינמי</span></code></pre>
+  <div class="box tip"><span class="label">אל תתבלבלי</span><code>new Point[5]</code> = מערך של 5 נקודות (בנאי ברירת מחדל לכל אחת). <code>new Point(5)</code> = נקודה אחת שנבנית עם הפרמטר 5. סוגריים מרובעים מול עגולים משנים הכול.</p></div>
+
+  <h4>ארגומנטים דיפולטיביים בבנאי</h4>
+  <p>אפשר לתת לפרמטר ערך ברירת מחדל, כך שאפשר להשמיט אותו בקריאה. זה מנגנון נפרד מעומס בנאים:</p>
+  <pre><code><span class="tok-fn">Point</span>(<span class="tok-key">int</span> x, <span class="tok-key">int</span> y, <span class="tok-key">bool</span> print = <span class="tok-key">true</span>);  <span class="tok-com">// print אופציונלי</span>
+<span class="tok-type">Point</span> a(<span class="tok-num">1</span>, <span class="tok-num">2</span>);        <span class="tok-com">// print מקבל true אוטומטית</span>
+<span class="tok-type">Point</span> b(<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-key">false</span>); <span class="tok-com">// מציינים במפורש</span></code></pre>
 
   <h3>⭐ סדר בנאים והרסנים בירושה</h3>
   <p>זו אחת השאלות הכי נפוצות. הכלל:</p>
@@ -413,6 +468,8 @@ cout &lt;&lt; (<span class="tok-num">5</span> == <span class="tok-num">3</span>)
     <span class="tok-com">// ... ממלא את Temp בערכים ...</span>
     <span class="tok-key">return</span> Temp;                     <span class="tok-com">// by value</span>
 }</code></pre>
+  <div class="box trap"><span class="label">מלכודת מבחן — כמה בנאים/הרסנים רצים בהחזרה by value?</span>
+  כשמחזירים אובייקט מקומי by value ומשימים אותו למשתנה חדש (<code>Point p3 = p1 + p2;</code>), נוצרת שרשרת שלמה: (1) הבנאי הרגיל בונה את <code>Temp</code> המקומי; (2) בנאי העתקה מעתיק את <code>Temp</code> לאובייקט זמני שמוחזר; (3) הזמני מועתק ל-<code>p3</code>; (4) ההרסנים של המקומי והזמני רצים. שאלות מבחן מבקשות לספור כמה פעמים רץ כל אחד — עקבי אחרי כל אובייקט זמני שנוצר ונהרס.</p></div>
 
   <h3>operator+= ו-operator*= — משנים את *this (by reference)</h3>
   <p>אלה משנים את האובייקט הקיים ומחזירים אותו עצמו — לכן <b>by reference</b>:</p>
@@ -474,6 +531,15 @@ cout &lt;&lt; (<span class="tok-num">5</span> == <span class="tok-num">3</span>)
   </table>
   <div class="box key"><span class="label">הקשר ל-Rule of Three (מודול 9)</span>
   אם מחלקה צריכה אחד מ-{הרסן, בנאי העתקה, <code>operator=</code>} — היא צריכה את <b>שלושתם</b>, כי לכולם אותה סיבה: ניהול נכון של המשאב הדינמי.</p></div>
+
+  <h4>אידיום: בנאי העתקה שמאציל ל-operator=</h4>
+  <p>כדי לא לשכפל את קוד ההעתקה העמוקה גם בבנאי ההעתקה וגם ב-<code>operator=</code>, אפשר לגרום לבנאי ההעתקה פשוט לקרוא ל-<code>operator=</code>:</p>
+  <pre><code><span class="tok-type">FVector</span>(<span class="tok-key">const</span> <span class="tok-type">FVector</span>&amp; a){
+    Items = <span class="tok-num">NULL</span>;   <span class="tok-com">// קריטי!</span>
+    *<span class="tok-key">this</span> = a;      <span class="tok-com">// מפעיל את operator= שעושה את כל העבודה</span>
+}</code></pre>
+  <div class="box trap"><span class="label">למה <code>Items = NULL</code> חובה כאן?</span>
+  ‎<code>operator=</code> מתחיל ב-<code>delete[] Items</code>. אבל באובייקט חדש (בתוך הבנאי) <code>Items</code> עדיין מכיל <b>זבל</b> — כתובת אקראית. <code>delete[]</code> על זבל = קריסה. לכן קודם מאפסים ל-<code>NULL</code> (מותר לעשות <code>delete[]</code> על <code>NULL</code> — זה פשוט לא עושה כלום), ורק אז קוראים ל-<code>operator=</code>.</p></div>
 
   <h3>operator() — אופרטור הקריאה</h3>
   <p>מעמיסים את הסוגריים עצמם, כך שאפשר "לקרוא" לאובייקט כמו לפונקציה: <code>vec(arr, 3)</code>. שימושי גם ל-functors (מודול 11).</p>
