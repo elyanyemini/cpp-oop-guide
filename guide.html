@@ -625,6 +625,24 @@ p-&gt;<span class="tok-fn">g</span>();   <span class="tok-com">// virtual → ל
 
   <h3>⭐ הרסן וירטואלי</h3>
   <p>אם מוחקים אובייקט דרך <code>Base*</code>, וההרסן של Base <b>אינו</b> virtual — רק הרסן ה-Base ירוץ, וההרסן של Derived לא. תוצאה: <b>דליפת משאבים</b> של Derived. הפתרון: להפוך את הרסן הבסיס ל-<code>virtual</code>.</p>
+  <p>נראה את זה על דוגמה מלאה. כאן ל-<code>Derived</code> יש שדה פרטי <code>int* p</code> — מצביע למערך דינמי של 10 מספרים, שהוקצה ב-<code>new</code> בבנאי ואמור להשתחרר ב-<code>delete[] p</code> בהרסן:</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Base</span> {
+<span class="tok-key">public</span>:
+    ~<span class="tok-fn">Base</span>(){ cout&lt;&lt;<span class="tok-str">"B"</span>; }        <span class="tok-com">// לא virtual!</span>
+};
+<span class="tok-key">class</span> <span class="tok-type">Derived</span> : <span class="tok-key">public</span> <span class="tok-type">Base</span> {
+    <span class="tok-key">int</span>* p;                          <span class="tok-com">// המשאב הדינמי של Derived</span>
+<span class="tok-key">public</span>:
+    <span class="tok-fn">Derived</span>(){ p = <span class="tok-key">new</span> <span class="tok-key">int</span>[<span class="tok-num">10</span>]; }   <span class="tok-com">// הבנאי מקצה מערך</span>
+    ~<span class="tok-fn">Derived</span>(){ <span class="tok-key">delete</span>[] p; cout&lt;&lt;<span class="tok-str">"D"</span>; }  <span class="tok-com">// ההרסן משחרר אותו</span>
+};
+
+<span class="tok-type">Base</span>* b = <span class="tok-key">new</span> <span class="tok-type">Derived</span>;   <span class="tok-com">// אובייקט Derived, מצביע מסוג Base*</span>
+<span class="tok-key">delete</span> b;                <span class="tok-com">// מוחקים דרך מצביע בסיס → מדפיס רק "B"!</span></code></pre>
+  <p><b>מה משתבש:</b> ההרסן של Base אינו <code>virtual</code>, אז המחיקה דרך <code>Base*</code> נבחרת לפי טיפוס המצביע — רץ רק <code>~Base()</code>, ו-<code>~Derived()</code> <b>לא רץ כלל</b>. לכן <code>delete[] p</code> שבתוכו אף פעם לא מתבצע, והמערך של 10 המספרים נשאר תפוס לנצח — <b>דליפת זיכרון</b>. (וגם ה-"D" לא מודפס, רק "B".)</p>
+  <p><b>הפתרון:</b> להפוך את הרסן הבסיס ל-<code>virtual ~Base()</code>. אז המחיקה הופכת פולימורפית ונבחרת לפי האובייקט האמיתי — קודם רץ <code>~Derived()</code> (שמשחרר את <code>p</code>), ואז <code>~Base()</code> מופעל אוטומטית אחריו. אין דליפה, ומודפס "DB".</p>
+  <div class="box tip"><span class="label">זכרי — הרסן הבסיס תמיד מופעל אוטומטית</span>
+  ברגע שהרסן היורשת רץ, הרסן הבסיס מופעל אחריו לבד, תמיד (סדר הפוך לבנייה). הבעיה בשאלה 8 היא לא ש-<code>~Base</code> חסר — אלא ש-<code>~Derived</code> בכלל לא <b>מתחיל</b> לרוץ בלי <code>virtual</code>.</p></div>
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 8)</span>
   <code>delete b;</code> כאשר <code>b</code> הוא <code>Base*</code> שמצביע על <code>Derived</code>, ולבסיס אין הרסן וירטואלי ← המשאב של Derived (המערך <code>p</code>) עלול לא להשתחרר. זו הבעיה המהותית.</p></div>
 
