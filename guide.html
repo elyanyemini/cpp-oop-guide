@@ -648,6 +648,21 @@ p-&gt;<span class="tok-fn">g</span>();   <span class="tok-com">// virtual → ל
 
   <h3>מחלקות אבסטרקטיות ומתודות pure virtual</h3>
   <p><code>virtual double area() const = 0;</code> היא מתודה <b>pure virtual</b> — בלי מימוש. מחלקה עם מתודה כזו היא <b>אבסטרקטית</b> ואי אפשר ליצור ממנה אובייקט. מחלקה יורשת חייבת <b>לממש</b> את כל המתודות ה-pure virtual, אחרת גם היא נשארת אבסטרקטית.</p>
+  <div class="box key"><span class="label">מה זה ה-<code>= 0</code>?</span>
+  ה-<code>= 0</code> בסוף החתימה הוא בדיוק מה שהופך את המתודה ל-<b>pure virtual</b>. הוא לא מציב ערך ולא קשור למספר אפס — זה תחביר מיוחד שאומר "למתודה הזו <b>אין מימוש כאן</b>, וכל מחלקה יורשת חייבת לספק אותו". מתודה עם <code>= 0</code> מכריחה את היורשות לממש, ולכן הבסיס עצמו הופך לאבסטרקטי (תבנית שאי אפשר ליצור ממנה אובייקט ישירות).</p></div>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Shape</span> {                       <span class="tok-com">// אבסטרקטית</span>
+<span class="tok-key">public</span>:
+    <span class="tok-key">virtual</span> <span class="tok-key">double</span> <span class="tok-fn">area</span>() <span class="tok-key">const</span> = <span class="tok-num">0</span>;   <span class="tok-com">// pure virtual — בלי גוף</span>
+};
+<span class="tok-key">class</span> <span class="tok-type">Circle</span> : <span class="tok-key">public</span> <span class="tok-type">Shape</span> {
+    <span class="tok-key">double</span> r;
+<span class="tok-key">public</span>:
+    <span class="tok-fn">Circle</span>(<span class="tok-key">double</span> radius) : r(radius) {}
+    <span class="tok-key">double</span> <span class="tok-fn">area</span>() <span class="tok-key">const</span> { <span class="tok-key">return</span> <span class="tok-num">3.14</span> * r * r; }  <span class="tok-com">// מספק מימוש → Circle כבר לא אבסטרקטית</span>
+};
+
+<span class="tok-type">Shape</span> s;        <span class="tok-com">// ❌ שגיאה — אי אפשר ליצור אובייקט ממחלקה אבסטרקטית</span>
+<span class="tok-type">Circle</span> c(<span class="tok-num">5</span>);   <span class="tok-com">// ✅ מותר — Circle מימשה את area</span></code></pre>
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 17)</span>
   אם <code>Circle</code> יורשת מ-<code>Shape</code> האבסטרקטית אבל <b>לא מממשת</b> את <code>area()</code>, אז Circle עדיין אבסטרקטית ← <code>Circle c;</code> הוא <b>שגיאת קומפילציה</b>.</p></div>
 
