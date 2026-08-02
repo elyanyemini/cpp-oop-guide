@@ -1121,6 +1121,41 @@ in &gt;&gt; word &gt;&gt; n;</code></pre>
   <p>המרה של אובייקט לרצף בייטים/טקסט שאפשר לשמור לקובץ, ואז לשחזר ממנו. הדרך הפשוטה: לכתוב מתודה <code>save(ostream&amp;)</code> שכותבת את השדות, ומתודה <code>load(istream&amp;)</code> שקוראת אותם באותו סדר.</p>
   <div class="box tip"><span class="label">קריאה בטקסט מול בינארי</span>
   קריאה/כתיבה טקסטואלית (<code>&lt;&lt;</code>, <code>&gt;&gt;</code>) קריאה לאדם. כתיבה בינארית (<code>write</code>/<code>read</code>) מהירה וקומפקטית אבל לא קריאה. לשמירת אובייקטים שלמים לרוב משתמשים בבינארי.</p></div>
+
+  <h3>מצבי פתיחה (open modes)</h3>
+  <p>אפשר לפתוח קובץ במצבים שונים, ולשלב אותם עם <code>|</code>:</p>
+  <table class="tbl">
+    <tr><td><code>ios::in</code> / <code>ios::out</code></td><td>קריאה / כתיבה</td></tr>
+    <tr><td><code>ios::app</code></td><td>הוספה בסוף (append), בלי למחוק קיים</td></tr>
+    <tr><td><code>ios::trunc</code></td><td>מחיקת התוכן הקיים בפתיחה</td></tr>
+    <tr><td><code>ios::binary</code></td><td>מצב בינארי (לא טקסט)</td></tr>
+  </table>
+  <pre><code><span class="tok-type">ofstream</span> f(<span class="tok-str">"data.bin"</span>, ios::out | ios::binary);  <span class="tok-com">// שילוב מצבים</span></code></pre>
+
+  <h3>כתיבה וקריאה בינארית — <code>write</code> / <code>read</code></h3>
+  <p>כותבים את הבייטים הגולמיים של משתנה. שתי המתודות מקבלות <code>char*</code> (מצביע לבייטים) ואת מספר הבייטים (<code>sizeof</code>), ולכן צריך cast:</p>
+  <pre><code><span class="tok-key">int</span> x = <span class="tok-num">42</span>;
+f.<span class="tok-fn">write</span>((<span class="tok-key">char</span>*)&amp;x, <span class="tok-key">sizeof</span>(x));   <span class="tok-com">// כותב את הבייטים של x</span>
+f.<span class="tok-fn">read</span>((<span class="tok-key">char</span>*)&amp;x, <span class="tok-key">sizeof</span>(x));    <span class="tok-com">// קורא אותם בחזרה</span></code></pre>
+
+  <h3>⭐ סריאליזציה של מחרוזת/מצביע (אורך משתנה)</h3>
+  <p>מספר בגודל קבוע פשוט לשמור. אבל שדה עם <b>אורך משתנה</b> (כמו <code>char* name</code>) מציב בעיה: כמה בייטים לקרוא בטעינה? הפתרון: לשמור <b>קודם את האורך</b>, ואז את הבייטים.</p>
+  <pre><code><span class="tok-com">// שמירה:</span>
+<span class="tok-key">int</span> len = <span class="tok-fn">strlen</span>(name);
+f.<span class="tok-fn">write</span>((<span class="tok-key">char</span>*)&amp;len, <span class="tok-key">sizeof</span>(len));   <span class="tok-com">// קודם האורך</span>
+f.<span class="tok-fn">write</span>(name, len);                    <span class="tok-com">// אז התווים</span>
+
+<span class="tok-com">// טעינה:</span>
+<span class="tok-key">int</span> len;
+f.<span class="tok-fn">read</span>((<span class="tok-key">char</span>*)&amp;len, <span class="tok-key">sizeof</span>(len));
+name = <span class="tok-key">new</span> <span class="tok-key">char</span>[len+<span class="tok-num">1</span>];             <span class="tok-com">// מקצים לפי האורך שנקרא</span>
+f.<span class="tok-fn">read</span>(name, len);
+name[len] = <span class="tok-str">'\0'</span>;</code></pre>
+  <div class="box trap"><span class="label">בעיית המצביעים בסריאליזציה</span>
+  אסור לשמור <b>מצביע</b> כמו שהוא — הכתובת חסרת משמעות בהרצה הבאה. שומרים תמיד את <b>מה שהוא מצביע עליו</b> (התוכן), ובטעינה מקצים זיכרון חדש. אותה בעיה כמו העתקה עמוקה (מודול 3).</p></div>
+
+  <h3>ניווט בקובץ וטעינה פולימורפית</h3>
+  <p><code>seekg</code>/<code>seekp</code> מזיזים את מיקום הקריאה/כתיבה; <code>tellg</code>/<code>tellp</code> מחזירים אותו; <code>getline</code> קורא שורה שלמה. <b>טעינה פולימורפית:</b> כדי לשחזר אובייקט שלא יודעים את טיפוסו מראש, שומרים בקובץ <b>קוד טיפוס</b> לפני הנתונים, ובטעינה קוראים אותו קודם כדי לדעת איזה אובייקט ליצור.</p>
 </section>
 
 <!-- ============ MODULE 11 ============ -->
@@ -1163,6 +1198,26 @@ cout &lt;&lt; f(<span class="tok-num">4</span>);  <span class="tok-com">// קו�
 cout &lt;&lt; add(<span class="tok-num">2</span>, <span class="tok-num">3</span>);  <span class="tok-com">// 5</span>
 <span class="tok-com">// [] = capture list, () = פרמטרים, {} = גוף</span></code></pre>
   <div class="box tip"><span class="label">קשר ל-functors</span>Lambda הוא בעצם functor שהקומפיילר יוצר עבורך מאחורי הקלעים.</p></div>
+
+  <h3>למה מצביע רגיל לא מספיק כאיטרטור</h3>
+  <p>מצביע עובד יופי על מערך (קידום = התא הבא בזיכרון). אבל על <b>רשימה מקושרת</b> או <b>עץ</b> האיברים מפוזרים בזיכרון — מצביע רגיל לא יידע "לקפוץ" לאיבר הבא. לכן כל מכולה מספקת <b>איטרטור</b> משלה: אובייקט שמעמיס את אותם אופרטורים (<code>*</code>, <code>++</code>, <code>==</code>, <code>!=</code>) אבל יודע לנווט במבנה הספציפי. זו ההפשטה שמאפשרת לאותו קוד לעבוד על כל מכולה.</p>
+
+  <h3>אלגוריתמים גנריים — <code>&lt;algorithm&gt;</code></h3>
+  <p>STL מספקת אלגוריתמים מוכנים שעובדים על כל מכולה דרך איטרטורים:</p>
+  <table class="tbl">
+    <tr><td><code>for_each</code></td><td>מפעיל פעולה על כל איבר</td></tr>
+    <tr><td><code>count_if</code> / <code>find_if</code></td><td>סופר / מוצא איברים שמקיימים תנאי</td></tr>
+    <tr><td><code>sort</code></td><td>ממיין, אפשר עם comparator מותאם</td></tr>
+    <tr><td><code>remove_if</code> + <code>erase</code></td><td>האידיום למחיקת איברים לפי תנאי</td></tr>
+  </table>
+  <pre><code><span class="tok-type">vector</span>&lt;<span class="tok-key">int</span>&gt; v = {<span class="tok-num">3</span>,<span class="tok-num">1</span>,<span class="tok-num">2</span>};
+<span class="tok-fn">sort</span>(v.<span class="tok-fn">begin</span>(), v.<span class="tok-fn">end</span>());              <span class="tok-com">// 1 2 3</span>
+<span class="tok-key">int</span> evens = <span class="tok-fn">count_if</span>(v.<span class="tok-fn">begin</span>(), v.<span class="tok-fn">end</span>(),
+                     [](<span class="tok-key">int</span> n){ <span class="tok-key">return</span> n%<span class="tok-num">2</span>==<span class="tok-num">0</span>; });  <span class="tok-com">// lambda כתנאי</span></code></pre>
+  <p>אפשר להעביר לאלגוריתמים <b>functor</b> או <b>lambda</b> כדי להזריק לוגיקה (למשל קריטריון מיון) — זה הקשר בין המכולות, האיטרטורים והאלגוריתמים.</p>
+
+  <h3>מכולות נוספות</h3>
+  <p>מעבר לארבע הבסיסיות, יש עוד: <code>deque</code> (תור דו-כיווני), <code>stack</code> ו-<code>queue</code> (מחסנית ותור), <code>priority_queue</code> (תור עדיפויות), ו-<code>multimap</code> (map שמתיר מפתחות כפולים).</p>
 </section>
 
 <!-- ============ QUIZ ============ -->
