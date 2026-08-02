@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>נספח · נושאים מתקדמים — OOP ב-C++</title>
+<style>
+  :root{
+    --bg:#0f1220; --panel:#171b2e; --panel2:#1e2338; --ink:#e9ecf6; --muted:#a7afce;
+    --brand:#c084fc; --brand2:#4ad6b8; --line:#2a3050; --code-bg:#0b0e1a;
+    --good:#2ecc71; --bad:#ff6b6b; --warn:#ffd166;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,"Arial",sans-serif;line-height:1.75;font-size:17px}
+  a{color:var(--brand)}
+  .wrap{display:flex;min-height:100vh}
+  nav.side{width:300px;flex-shrink:0;background:var(--panel);border-inline-start:1px solid var(--line);padding:20px 16px;position:sticky;top:0;height:100vh;overflow:auto}
+  nav.side h1{font-size:18px;margin:0 0 4px;color:#fff}
+  nav.side .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:9px 12px;border-radius:9px;font-size:14.5px;margin-bottom:3px}
+  nav.side a:hover{background:var(--panel2)}
+  nav.side a.active{background:linear-gradient(90deg,var(--brand),#d8b4fe);color:#0b0e1a;font-weight:700}
+  nav.side .grouplabel{color:var(--brand2);font-size:12px;letter-spacing:.5px;margin:16px 6px 6px;text-transform:uppercase;font-weight:700}
+  main{flex:1;padding:36px 44px;max-width:960px;margin:0 auto}
+  section.lesson{display:none;animation:fade .3s ease}
+  section.lesson.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  h2.title{font-size:30px;margin:0 0 6px;color:#fff;border-bottom:3px solid var(--brand);padding-bottom:12px}
+  h3{color:var(--brand2);font-size:22px;margin:30px 0 10px}
+  h4{color:#fff;font-size:18px;margin:22px 0 6px}
+  p{margin:10px 0}
+  .lead{color:var(--muted);font-size:16px}
+  code:not(pre code){background:var(--code-bg);padding:2px 7px;border-radius:6px;font-family:"Consolas","Courier New",monospace;font-size:14px;color:#ffd39b;direction:ltr;display:inline-block}
+  pre{background:var(--code-bg);border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow:auto;direction:ltr;text-align:left}
+  pre code{font-family:"Consolas","Courier New",monospace;font-size:13.5px;line-height:1.6;color:#e6edf3;white-space:pre}
+  .tok-key{color:#ff7b9c}.tok-type{color:#8ad6ff}.tok-str{color:#c3e88d}.tok-com{color:#6b7394;font-style:italic}.tok-num{color:#f7c873}.tok-fn{color:#82aaff}
+  .box{border-radius:12px;padding:14px 18px;margin:18px 0;border:1px solid var(--line)}
+  .box.tip{background:rgba(74,214,184,.08);border-color:rgba(74,214,184,.4)}
+  .box.trap{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.4)}
+  .box.key{background:rgba(255,209,102,.08);border-color:rgba(255,209,102,.4)}
+  .box b{color:#fff}
+  .box .label{font-weight:700;display:block;margin-bottom:4px}
+  .box.tip .label{color:var(--brand2)}
+  .box.trap .label{color:var(--bad)}
+  .box.key .label{color:var(--warn)}
+  .maps{color:var(--muted);font-size:14px;background:var(--panel2);border-radius:8px;padding:8px 12px;display:inline-block;margin-top:4px}
+  table.tbl{border-collapse:collapse;width:100%;margin:16px 0;font-size:15px}
+  table.tbl th,table.tbl td{border:1px solid var(--line);padding:9px 12px;text-align:right}
+  table.tbl th{background:var(--panel2);color:#fff}
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:20px 0}
+  .q .qnum{color:var(--brand2);font-weight:700;font-size:14px;letter-spacing:.5px}
+  .q .qtext{font-size:17px;margin:6px 0 12px}
+  .opt{display:block;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin:8px 0;cursor:pointer;transition:.15s}
+  .opt:hover{border-color:var(--brand)}
+  .opt.correct{background:rgba(46,204,113,.16);border-color:var(--good)}
+  .opt.wrong{background:rgba(255,107,107,.16);border-color:var(--bad)}
+  .opt .letter{font-weight:700;color:var(--brand);margin-inline-end:8px}
+  .explain{display:none;margin-top:12px;padding:12px 15px;border-radius:10px;background:var(--code-bg);border:1px solid var(--line);font-size:15px}
+  .explain.show{display:block}
+  .explain .ans{color:var(--good);font-weight:700}
+  .scorebar{position:sticky;top:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:16px;z-index:5}
+  .scorebar b{color:var(--brand2);font-size:20px}
+  .btn{background:linear-gradient(90deg,var(--brand),#d8b4fe);color:#0b0e1a;border:none;border-radius:9px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .progress{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;flex:1}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand2),var(--brand));transition:.4s}
+  .callout{background:var(--panel2);border-inline-start:4px solid var(--brand);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:15px}
+  footer{color:var(--muted);font-size:13px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+  @media(max-width:820px){.wrap{flex-direction:column}nav.side{width:100%;height:auto;position:static}main{padding:22px 16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>נספח · נושאים מתקדמים</h1>
+  <div class="sub">משלים את המדריך הראשי לכיסוי מלא של המצגות</div>
+  <a data-go="intro" class="active">מבוא לנספח</a>
+  <div class="grouplabel">מודולים מתקדמים</div>
+  <a data-go="a1">A1 · operator= וכלל השלושה המלא</a>
+  <a data-go="a2">A2 · העמסת אופרטורים מתקדמת</a>
+  <a data-go="a3">A3 · חריגים לעומק</a>
+  <a data-go="a4">A4 · const מתקדם ו-mutable</a>
+  <a data-go="a5">A5 · static לעומק</a>
+  <a data-go="a6">A6 · ירושה — דריסה והסתרת שם</a>
+  <a data-go="a7">A7 · הרשאות ירושה</a>
+  <a data-go="a8">A8 · איך פולימורפיזם עובד (vtable)</a>
+  <a data-go="a9">A9 · מחלקות תבנית</a>
+  <a data-go="a10">A10 · קבצים לעומק</a>
+  <a data-go="a11">A11 · STL לעומק</a>
+  <a data-go="a12">A12 · Reference Counting ו-CoW</a>
+  <div class="grouplabel">תרגול</div>
+  <a data-go="quiz">בוחן מתקדם (15)</a>
+</nav>
+
+<main>
+
+<!-- INTRO -->
+<section class="lesson show" id="intro">
+  <h2 class="title">נספח — נושאים מתקדמים</h2>
+  <p class="lead">המדריך הראשי מכסה את הנושאים שנבדקו בשאלות התרגול. הנספח הזה משלים אותו: הוא מכסה את כל שאר החומר שמופיע במצגות הקורס אך לא במדריך הראשי — לכיסוי מלא של הסילבוס.</p>
+  <div class="box tip"><span class="label">איך להשתמש</span>
+  אם כבר סיימת את המדריך הראשי ואת מרגישה בטוחה בשאלות התרגול — עברי לכאן להעמקה. כל מודול בנוי כמו במדריך הראשי: הסבר → דוגמה → מלכודות. בסוף יש בוחן מתקדם עם 15 שאלות חדשות בסגנון אמריקאי.</p></div>
+  <div class="box key"><span class="label">מה מכוסה כאן ולמה זה חשוב</span>
+  הנושאים כאן (במיוחד <b>operator=</b>, <b>מחלקות תבנית</b>, <b>חריגים לעומק</b> ו-<b>vtable</b>) הם חומר קלאסי למבחני OOP. גם אם לא הופיעו בשאלות התרגול, כדאי להכיר אותם.</p></div>
+  <h3>מפת הנספח</h3>
+  <table class="tbl">
+    <tr><th>מודול</th><th>נושא</th><th>מקור במצגות</th></tr>
+    <tr><td>A1</td><td>operator= וכלל השלושה המלא</td><td>4, 5</td></tr>
+    <tr><td>A2</td><td>העמסת אופרטורים מתקדמת</td><td>4</td></tr>
+    <tr><td>A3</td><td>חריגים לעומק</td><td>3.1</td></tr>
+    <tr><td>A4</td><td>const מתקדם ו-mutable</td><td>3.3</td></tr>
+    <tr><td>A5</td><td>static לעומק</td><td>3.4</td></tr>
+    <tr><td>A6</td><td>ירושה — דריסה, הסתרת שם, קריאה לבסיס</td><td>5</td></tr>
+    <tr><td>A7</td><td>הרשאות ירושה private/protected</td><td>7</td></tr>
+    <tr><td>A8</td><td>vtable — איך פולימורפיזם עובד</td><td>6</td></tr>
+    <tr><td>A9</td><td>מחלקות תבנית</td><td>9</td></tr>
+    <tr><td>A10</td><td>קבצים לעומק</td><td>8</td></tr>
+    <tr><td>A11</td><td>STL לעומק</td><td>10, 11</td></tr>
+    <tr><td>A12</td><td>Reference Counting ו-Copy-on-Write</td><td>11</td></tr>
+  </table>
+</section>
+
+<!-- A1 -->
+<section class="lesson" id="a1">
+  <h2 class="title">A1 · אופרטור השמה וכלל השלושה המלא</h2>
+  <p class="lead">מה קורה כשכותבים <code>a = b</code> על אובייקטים, ולמה זה אחד הנושאים החשובים ביותר.</p>
+
+  <h3>ההבדל בין העתקה להשמה</h3>
+  <table class="tbl">
+    <tr><th></th><th>בנאי העתקה</th><th>אופרטור השמה <code>operator=</code></th></tr>
+    <tr><td>מתי</td><td>יצירת אובייקט <b>חדש</b>: <code>B b = a;</code></td><td>אובייקט <b>קיים</b>: <code>b = a;</code></td></tr>
+    <tr><td>מצב היעד</td><td>ריק (עוד לא אותחל)</td><td>כבר מחזיק נתונים (אולי משאב דינמי)</td></tr>
+  </table>
+
+  <h3>מימוש נכון של operator= (עם משאב דינמי)</h3>
+  <p>שלושה דברים חובה: (1) בדיקת השמה-עצמית, (2) שחרור המשאב הישן, (3) העתקה עמוקה, ולבסוף החזרת <code>*this</code>.</p>
+  <pre><code><span class="tok-type">FVector</span>&amp; <span class="tok-fn">operator=</span>(<span class="tok-key">const</span> <span class="tok-type">FVector</span>&amp; other) {
+    <span class="tok-key">if</span> (<span class="tok-key">this</span> != &amp;other) {      <span class="tok-com">// 1. הגנה מפני a = a</span>
+        <span class="tok-key">delete</span>[] items;         <span class="tok-com">// 2. שחרור המשאב הישן</span>
+        size = other.size;
+        items = <span class="tok-key">new</span> <span class="tok-key">float</span>[size]; <span class="tok-com">// 3. הקצאה חדשה + העתקה עמוקה</span>
+        <span class="tok-key">for</span> (<span class="tok-key">int</span> i=<span class="tok-num">0</span>; i&lt;size; i++) items[i]=other.items[i];
+    }
+    <span class="tok-key">return</span> *<span class="tok-key">this</span>;         <span class="tok-com">// מאפשר שרשור: a = b = c</span>
+}</code></pre>
+
+  <div class="box trap"><span class="label">מלכודת: בלי בדיקת השמה-עצמית</span>
+  אם משמיטים את <code>if(this != &amp;other)</code>, אז <code>a = a</code> יבצע קודם <code>delete[] items</code> — ובכך ימחק את הנתונים ש<b>מהם</b> אנחנו מנסים להעתיק. התוצאה: זבל / קריסה.</p></div>
+
+  <div class="box key"><span class="label">כלל השלושה (Rule of Three) — הניסוח המלא</span>
+  אם מחלקה צריכה אחד מהשלושה, כמעט תמיד היא צריכה את כולם: <b>הרסן</b>, <b>בנאי העתקה</b>, <b>operator=</b>. הסיבה: ברירת המחדל של הקומפיילר מבצעת <b>העתקה שטחית</b> (מעתיקה מצביע, לא את מה שהוא מצביע עליו).</p></div>
+
+  <div class="box trap"><span class="label">מלכודת בירושה: operator= ברירת המחדל = shallow copy</span>
+  גם אם מחלקת הבסיס מימשה operator= נכון, ל<b>יורשת</b> שמוסיפה משאב דינמי משלה יש operator= אוטומטי שמבצע העתקה שטחית של המשאב החדש. הפתרון: לממש operator= ליורשת, שקורא קודם ל-<code>Base::operator=(other)</code> ואז מעתיק עמוק את השדות שלה.</p></div>
+  <p class="maps">מכסה: מצגות 4, 5</p>
+</section>
+
+<!-- A2 -->
+<section class="lesson" id="a2">
+  <h2 class="title">A2 · העמסת אופרטורים מתקדמת</h2>
+  <p class="lead">מעבר ל-<code>[]</code>, <code>&lt;&lt;</code> ו-<code>++</code> שכבר ראית — כאן: <code>+</code>, member מול global, אופרטור המרה, ו-<code>operator()</code>.</p>
+
+  <h3>member מול global (friend) — ולמה זה משנה</h3>
+  <p>כשמעמיסים אופרטור בינארי כ<b>מתודה</b>, האופרנד השמאלי חייב להיות האובייקט שלנו. לכן <code>a + 5</code> עובד (a הוא האובייקט), אבל <code>5 + a</code> <b>לא</b> — כי האופרנד השמאלי הוא <code>int</code>.</p>
+  <div class="box key"><span class="label">הכלל</span>
+  אם האופרנד השמאלי אינו מהמחלקה שלך (למשל <code>5 - a</code>, <code>cout &lt;&lt; a</code>), האופרטור <b>חייב</b> להיות פונקציה גלובלית (לרוב <code>friend</code>), לא מתודה. לסימטריה מלאה מגדירים לרוב את שתי הגרסאות.</p></div>
+  <pre><code><span class="tok-com">// גלובלי — מאפשר גם 5 - a וגם a - 5</span>
+<span class="tok-key">friend</span> <span class="tok-type">Money</span> <span class="tok-fn">operator-</span>(<span class="tok-key">const</span> <span class="tok-type">Money</span>&amp; a, <span class="tok-key">const</span> <span class="tok-type">Money</span>&amp; b);</code></pre>
+
+  <h3>אופרטור המרה (conversion operator)</h3>
+  <p>מאפשר לאובייקט "להתחפש" לטיפוס אחר אוטומטית. שימי לב: אין טיפוס החזרה כתוב — הוא נקבע מהשם.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Money</span> {
+    <span class="tok-key">int</span> agorot;
+<span class="tok-key">public</span>:
+    <span class="tok-fn">operator</span> <span class="tok-key">int</span>() <span class="tok-key">const</span> { <span class="tok-key">return</span> agorot; }  <span class="tok-com">// המרה ל-int</span>
+};
+<span class="tok-type">Money</span> m;
+<span class="tok-key">int</span> x = m;   <span class="tok-com">// מפעיל את אופרטור ההמרה אוטומטית</span></code></pre>
+
+  <h3>operator() — אופרטור הקריאה לפונקציה</h3>
+  <p>מעמיסים את הסוגריים כדי "לקרוא" לאובייקט כאילו הוא פונקציה. זה הבסיס ל-<b>functors</b> (מודול A11).</p>
+  <pre><code><span class="tok-key">struct</span> <span class="tok-type">Adder</span> {
+    <span class="tok-key">int</span> <span class="tok-fn">operator()</span>(<span class="tok-key">int</span> a, <span class="tok-key">int</span> b) <span class="tok-key">const</span> { <span class="tok-key">return</span> a+b; }
+};
+<span class="tok-type">Adder</span> add;
+cout &lt;&lt; add(<span class="tok-num">2</span>, <span class="tok-num">3</span>);   <span class="tok-com">// 5 — נראה כמו פונקציה, זה אובייקט</span></code></pre>
+
+  <div class="box tip"><span class="label">operator+ מחזיר by value</span>
+  <code>a + b</code> יוצר אובייקט <b>חדש</b> (הסכום), ולכן מחזירים <b>by value</b> (עותק). לעומת זאת <code>operator+=</code> משנה את האובייקט הקיים ומחזיר <code>*this</code> ב-reference.</p></div>
+  <p class="maps">מכסה: מצגת 4</p>
+</section>
+
+<!-- A3 -->
+<section class="lesson" id="a3">
+  <h2 class="title">A3 · טיפול בשגיאות — חריגים לעומק</h2>
+  <p class="lead">מעבר ל-throw בסיסי: מחלקות חריג משלך, catch מרובה, catch-all, וניקוי לפני זריקה.</p>
+
+  <h3>למה לא קודי שגיאה?</h3>
+  <p>החזרת קוד שגיאה (למשל -1) בעייתית: אפשר להתעלם ממנו, צריך <code>if</code> אחרי כל קריאה, והוא לא נושא מידע. וחשוב: <b>לבנאים ולהרסנים אין ערך החזרה</b> — אז אין להם דרך לדווח על שגיאה חוץ מחריג.</p>
+
+  <h3>מחלקת חריג משלך</h3>
+  <p>אפשר לזרוק כל דבר — מספר, מחרוזת, או אובייקט. אובייקט עדיף כי הוא נושא מידע.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">DivByZero</span> {
+    <span class="tok-type">string</span> msg;
+<span class="tok-key">public</span>:
+    <span class="tok-fn">DivByZero</span>(<span class="tok-type">string</span> m) : msg(m) {}
+    <span class="tok-type">string</span> <span class="tok-fn">what</span>() <span class="tok-key">const</span> { <span class="tok-key">return</span> msg; }
+};
+<span class="tok-key">if</span> (b == <span class="tok-num">0</span>) <span class="tok-key">throw</span> <span class="tok-type">DivByZero</span>(<span class="tok-str">"חלוקה באפס"</span>);</code></pre>
+
+  <h3>catch מרובה ו-catch-all</h3>
+  <div class="box key"><span class="label">כללים חשובים</span>
+  תופסים אובייקט חריג <b>by reference</b> (<code>catch(DivByZero&amp; e)</code>) כדי למנוע slicing. אפשר כמה בלוקי <code>catch</code> לפי טיפוס. <code>catch(...)</code> תופס הכל — <b>וחייב להיות אחרון</b>, אחרת הוא "יבלע" את כל השאר.</p></div>
+  <pre><code><span class="tok-key">try</span> { risky(); }
+<span class="tok-key">catch</span>(<span class="tok-type">DivByZero</span>&amp; e) { cout &lt;&lt; e.<span class="tok-fn">what</span>(); }
+<span class="tok-key">catch</span>(<span class="tok-key">int</span> code)       { cout &lt;&lt; code; }
+<span class="tok-key">catch</span>(...)             { cout &lt;&lt; <span class="tok-str">"שגיאה לא ידועה"</span>; }  <span class="tok-com">// חייב אחרון</span></code></pre>
+
+  <div class="box trap"><span class="label">מלכודת: דליפת זיכרון בזריקה</span>
+  אם הקצית זיכרון (<code>new</code>) ואז זרקת חריג <b>לפני</b> ששחררת אותו — הזיכרון דולף (ה-stack unwinding לא מריץ <code>delete</code> על מצביעים גולמיים). לכן משחררים לפני ה-throw, או משתמשים ב-RAII.</p></div>
+
+  <div class="box tip"><span class="label">חריג בבנאי (תזכורת מהמדריך הראשי)</span>
+  אם נזרק חריג בבנאי, האובייקט לא נבנה במלואו ← ההרסן שלו לא ירוץ. משאבים שכבר הוקצו בבנאי צריכים שחרור ידני לפני ה-throw.</p></div>
+  <p class="maps">מכסה: מצגת 3.1</p>
+</section>
+
+<!-- A4 -->
+<section class="lesson" id="a4">
+  <h2 class="title">A4 · const מתקדם ו-mutable</h2>
+  <p class="lead">איפה בדיוק שמים <code>const</code>, ומה עושים כשרוצים לשנות שדה גם על אובייקט const.</p>
+
+  <h3>ארבעה מקומות ל-const</h3>
+  <table class="tbl">
+    <tr><th>מיקום</th><th>משמעות</th></tr>
+    <tr><td><code>const int x</code></td><td>המשתנה עצמו לא ניתן לשינוי</td></tr>
+    <tr><td><code>const int& get()</code></td><td>הערך המוחזר לא ניתן לשינוי דרך ה-reference</td></tr>
+    <tr><td><code>void f(const T& p)</code></td><td>הפרמטר לא ישונה בפונקציה (מעביר בלי להעתיק)</td></tr>
+    <tr><td><code>int get() const</code></td><td>המתודה לא משנה את האובייקט → מותר לקרוא לה על אובייקט const</td></tr>
+  </table>
+
+  <div class="box key"><span class="label">הכלל הגדול של const-correctness</span>
+  על אובייקט <code>const</code> מותר לקרוא <b>רק</b> למתודות שמסומנות <code>const</code>. אם מתודה לא מסומנת const — קריאה אליה מאובייקט const היא שגיאת קומפילציה.</p></div>
+  <pre><code><span class="tok-key">const</span> <span class="tok-type">Name</span> gabi(<span class="tok-str">"Gabi"</span>);
+gabi.<span class="tok-fn">getName</span>();   <span class="tok-com">// OK אם getName() const</span>
+gabi.<span class="tok-fn">setName</span>(...);  <span class="tok-com">// שגיאה! setName משנה את האובייקט</span></code></pre>
+
+  <h3>mutable — החריג לכלל</h3>
+  <p>שדה שמסומן <code>mutable</code> מותר לשינוי <b>גם</b> בתוך מתודת const וגם על אובייקט const. השימוש הקלאסי: <b>caching</b> — לשמור תוצאה מחושבת בלי "לשבור" את ההבטחה של const.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Circle</span> {
+    <span class="tok-key">double</span> r;
+    <span class="tok-key">mutable</span> <span class="tok-key">double</span> cachedArea;   <span class="tok-com">// ניתן לשינוי גם ב-const</span>
+    <span class="tok-key">mutable</span> <span class="tok-key">bool</span> valid = <span class="tok-key">false</span>;
+<span class="tok-key">public</span>:
+    <span class="tok-key">double</span> <span class="tok-fn">area</span>() <span class="tok-key">const</span> {      <span class="tok-com">// const — אבל מעדכן cache</span>
+        <span class="tok-key">if</span> (!valid) { cachedArea = <span class="tok-num">3.14</span>*r*r; valid = <span class="tok-key">true</span>; }
+        <span class="tok-key">return</span> cachedArea;
+    }
+};</code></pre>
+  <p class="maps">מכסה: מצגת 3.3</p>
+</section>
+
+<!-- A5 -->
+<section class="lesson" id="a5">
+  <h2 class="title">A5 · static לעומק</h2>
+  <p class="lead">שדה משותף לכל המחלקה, אתחולו מחוץ למחלקה, ומתודות static.</p>
+
+  <h3>שדה static — עותק אחד לכל המחלקה</h3>
+  <p>שדה רגיל קיים בכל אובייקט בנפרד. שדה <code>static</code> קיים <b>פעם אחת</b> ומשותף לכל האובייקטים. שימוש קלאסי: לספור כמה אובייקטים נוצרו.</p>
+
+  <div class="box trap"><span class="label">מלכודת: חובה לאתחל מחוץ למחלקה</span>
+  הכרזה על שדה static בתוך המחלקה <b>לא מקצה לו זיכרון</b>. חייבים שורת הגדרה אחת מחוץ למחלקה, אחרת מקבלים <b>שגיאת קישור (linker error)</b>.</p></div>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Player</span> {
+    <span class="tok-key">static</span> <span class="tok-key">int</span> count;      <span class="tok-com">// הכרזה בלבד</span>
+<span class="tok-key">public</span>:
+    <span class="tok-fn">Player</span>()  { count++; }
+    ~<span class="tok-fn">Player</span>() { count--; }
+    <span class="tok-key">static</span> <span class="tok-key">int</span> <span class="tok-fn">getCount</span>() { <span class="tok-key">return</span> count; }  <span class="tok-com">// מתודה static</span>
+};
+<span class="tok-key">int</span> <span class="tok-type">Player</span>::count = <span class="tok-num">0</span>;    <span class="tok-com">// ← הגדרה + אתחול, מחוץ למחלקה. חובה!</span>
+
+cout &lt;&lt; <span class="tok-type">Player</span>::<span class="tok-fn">getCount</span>();  <span class="tok-com">// קוראים דרך שם המחלקה, בלי אובייקט</span></code></pre>
+
+  <div class="box key"><span class="label">מתודה static</span>
+  אין לה <code>this</code> (היא לא שייכת לאובייקט מסוים), ולכן היא יכולה לגשת <b>רק</b> לשדות ומתודות static. קוראים לה דרך <code>Class::method()</code>.</p></div>
+  <p class="maps">מכסה: מצגת 3.4</p>
+</section>
+
+<!-- A6 -->
+<section class="lesson" id="a6">
+  <h2 class="title">A6 · ירושה — דריסה, הסתרת שם וקריאה לבסיס</h2>
+  <p class="lead">מה קורה כשליורשת ולבסיס יש מתודה או שדה באותו שם.</p>
+
+  <h3>דריסה (overriding) וקריאה מפורשת לבסיס</h3>
+  <p>יורשת יכולה להגדיר מחדש מתודה של הבסיס. עדיין אפשר לקרוא לגרסת הבסיס במפורש עם <code>Base::method()</code>.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Stack</span> { <span class="tok-key">public</span>: <span class="tok-key">void</span> <span class="tok-fn">Push</span>(<span class="tok-key">int</span> x){} };
+<span class="tok-key">class</span> <span class="tok-type">SumStack</span> : <span class="tok-key">public</span> <span class="tok-type">Stack</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-key">void</span> <span class="tok-fn">Push</span>(<span class="tok-key">int</span> x) {
+        <span class="tok-type">Stack</span>::<span class="tok-fn">Push</span>(x);   <span class="tok-com">// קריאה מפורשת לגרסת הבסיס</span>
+        <span class="tok-com">// ... לוגיקה נוספת (עדכון סכום)</span>
+    }
+};</code></pre>
+
+  <h3>⭐ הסתרת שם (Name Hiding)</h3>
+  <div class="box trap"><span class="label">מלכודת חשובה</span>
+  אם היורשת מגדירה מתודה בשם מסוים, היא <b>מסתירה את כל</b> העומסים (overloads) של אותו שם בבסיס — גם בעלי חתימה שונה. לכן אם הבסיס מגדיר <code>f()</code> והיורשת מגדירה <code>f(int)</code>, אז <code>d.f()</code> (בלי פרמטר) <b>לא יתקמפל</b> — למרות ש-f() קיים בבסיס.</p></div>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">A</span> { <span class="tok-key">public</span>: <span class="tok-key">void</span> <span class="tok-fn">f</span>() {} };
+<span class="tok-key">class</span> <span class="tok-type">B</span> : <span class="tok-key">public</span> <span class="tok-type">A</span> { <span class="tok-key">public</span>: <span class="tok-key">void</span> <span class="tok-fn">f</span>(<span class="tok-key">int</span> x) {} };
+<span class="tok-type">B</span> b;
+b.<span class="tok-fn">f</span>(<span class="tok-num">5</span>);   <span class="tok-com">// OK</span>
+b.<span class="tok-fn">f</span>();    <span class="tok-com">// שגיאה! A::f() הוסתר. פתרון: b.A::f() או using A::f;</span></code></pre>
+
+  <h3>הסתרת שדות</h3>
+  <p>אותו רעיון לשדות: אם ליורשת שדה <code>y</code> ולבסיס גם <code>y</code>, הגישה הרגילה מגיעה לשדה של היורשת. לשדה הבסיס: <code>A::y</code>.</p>
+  <p class="maps">מכסה: מצגת 5</p>
+</section>
+
+<!-- A7 -->
+<section class="lesson" id="a7">
+  <h2 class="title">A7 · הרשאות ירושה — private / protected</h2>
+  <p class="lead">איך סוג הירושה משנה את הנגישות, ואיך "לחשוף מחדש" חבר בודד.</p>
+
+  <h3>תזכורת: השפעת סוג הירושה</h3>
+  <table class="tbl">
+    <tr><th>חבר בבסיס</th><th>public inheritance</th><th>protected inheritance</th><th>private inheritance</th></tr>
+    <tr><td>public</td><td>public</td><td>protected</td><td>private</td></tr>
+    <tr><td>protected</td><td>protected</td><td>protected</td><td>private</td></tr>
+    <tr><td>private</td><td colspan="3">לעולם לא נגיש ליורשת</td></tr>
+  </table>
+
+  <div class="box key"><span class="label">מה זה אומר בפועל</span>
+  ירושת <code>private</code> אומרת "יש-לי" יותר מ"אני-סוג-של". כל החברים הציבוריים של הבסיס הופכים לפרטיים ← לא נגישים דרך אובייקט של היורשת, ולא עוברים הלאה ליורשות של היורשת.</p></div>
+
+  <h3>חשיפה מחדש (re-exposing) של חבר בודד</h3>
+  <p>אחרי ירושת <code>private</code>/<code>protected</code>, אפשר "להחזיר" חבר יחיד לרמת public בעזרת הצהרת <code>using</code> (או שם מלא) באזור ה-public של היורשת.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">A</span> { <span class="tok-key">public</span>: <span class="tok-key">int</span> x; <span class="tok-key">void</span> <span class="tok-fn">g</span>(){} };
+<span class="tok-key">class</span> <span class="tok-type">B</span> : <span class="tok-key">private</span> <span class="tok-type">A</span> {   <span class="tok-com">// הכל הופך private</span>
+<span class="tok-key">public</span>:
+    <span class="tok-key">using</span> <span class="tok-type">A</span>::g;          <span class="tok-com">// חושף מחדש רק את g כ-public</span>
+};
+<span class="tok-type">B</span> b;
+b.<span class="tok-fn">g</span>();   <span class="tok-com">// OK — נחשף מחדש</span>
+b.x;     <span class="tok-com">// שגיאה — x נשאר private</span></code></pre>
+  <p class="maps">מכסה: מצגת 7</p>
+</section>
+
+<!-- A8 -->
+<section class="lesson" id="a8">
+  <h2 class="title">A8 · איך פולימורפיזם עובד באמת (vtable)</h2>
+  <p class="lead">המנגנון מאחורי <code>virtual</code> — נושא שאוהבים לשאול עליו "how it works".</p>
+
+  <h3>קישור סטטי מול דינמי</h3>
+  <div class="box key"><span class="label">שני סוגי קישור</span>
+  <b>קישור סטטי</b> (בזמן קומפילציה): הקומפיילר מחליט איזו פונקציה לקרוא לפי הטיפוס המוצהר. זו ברירת המחדל ב-C++.<br>
+  <b>קישור דינמי</b> (בזמן ריצה): ההחלטה נדחית לזמן הריצה לפי הטיפוס האמיתי. מופעל <b>רק</b> כשהמתודה <code>virtual</code>.</p></div>
+  <p>שימי לב: זה שונה מ-Java, שבה כל המתודות דינמיות כברירת מחדל. ב-C++ צריך לכתוב <code>virtual</code> במפורש.</p>
+
+  <h3>vtable ו-vfptr</h3>
+  <p>ברגע שלמחלקה יש מתודה <code>virtual</code> אחת, הקומפיילר יוצר עבורה <b>טבלת פונקציות וירטואליות (vtable)</b> — מערך של כתובות של המתודות הווירטואליות. כל אובייקט מקבל מצביע נסתר (<code>vfptr</code>) לטבלה של המחלקה האמיתית שלו.</p>
+  <pre><code><span class="tok-com">// כשכותבים:</span>
+p-&gt;<span class="tok-fn">g</span>();
+<span class="tok-com">// הקומפיילר מתרגם בערך ל:</span>
+(*(p-&gt;vfptr)[indexOf_g])(p);   <span class="tok-com">// חיפוש הכתובת בטבלה בזמן ריצה</span></code></pre>
+  <p>לכן קריאה וירטואלית "יודעת" להגיע לגרסה הנכונה: היא לא מקודדת מראש, אלא נשלפת מהטבלה של האובייקט האמיתי.</p>
+
+  <div class="box tip"><span class="label">מסקנות מעשיות</span>
+  לכן פולימורפיזם עובד רק דרך מצביע/reference (לאובייקט יש vfptr אמיתי), ולא ב-slicing. ולכן חשוב הרסן <code>virtual</code> — כדי שגם ההרסן ייבחר מהטבלה הנכונה.</p></div>
+  <p class="maps">מכסה: מצגת 6</p>
+</section>
+
+<!-- A9 -->
+<section class="lesson" id="a9">
+  <h2 class="title">A9 · מחלקות תבנית (Template Classes)</h2>
+  <p class="lead">לא רק פונקציות תבנית — מחלקה שלמה שעובדת על כל טיפוס.</p>
+
+  <h3>הגדרת מחלקת תבנית</h3>
+  <pre><code><span class="tok-key">template</span> &lt;<span class="tok-key">class</span> <span class="tok-type">T</span>&gt;
+<span class="tok-key">class</span> <span class="tok-type">Vector</span> {
+    <span class="tok-type">T</span>* items;
+    <span class="tok-key">int</span> size;
+<span class="tok-key">public</span>:
+    <span class="tok-type">T</span>&amp; <span class="tok-fn">operator[]</span>(<span class="tok-key">int</span> i);
+    <span class="tok-key">void</span> <span class="tok-fn">print</span>() <span class="tok-key">const</span>;
+};
+
+<span class="tok-type">Vector</span>&lt;<span class="tok-key">int</span>&gt; vi;        <span class="tok-com">// גרסה ל-int</span>
+<span class="tok-type">Vector</span>&lt;<span class="tok-type">Student</span>&gt; vs;    <span class="tok-com">// גרסה ל-Student</span></code></pre>
+
+  <div class="box trap"><span class="label">מלכודת: הגדרת מתודה מחוץ למחלקה</span>
+  כשמגדירים מתודה של מחלקת תבנית מחוץ למחלקה, חייבים לחזור על שורת ה-<code>template</code> ולכתוב את שם המחלקה עם <code>&lt;T&gt;</code>:</p>
+  <pre><code><span class="tok-key">template</span> &lt;<span class="tok-key">class</span> <span class="tok-type">T</span>&gt;
+<span class="tok-key">void</span> <span class="tok-type">Vector</span>&lt;<span class="tok-type">T</span>&gt;::<span class="tok-fn">print</span>() <span class="tok-key">const</span> { <span class="tok-com">/* ... */</span> }</code></pre>
+  </div>
+
+  <h3>התמחות (specialization)</h3>
+  <p>לפעמים טיפוס מסוים דורש מימוש שונה. אפשר לספק גרסה ייעודית. דוגמה קלאסית: <code>max</code> על מחרוזות דורש <code>strcmp</code>, לא <code>&lt;</code>.</p>
+  <pre><code><span class="tok-key">template</span> &lt;&gt;               <span class="tok-com">// התמחות מלאה</span>
+<span class="tok-key">const</span> <span class="tok-key">char</span>* <span class="tok-fn">maxT</span>(<span class="tok-key">const</span> <span class="tok-key">char</span>* a, <span class="tok-key">const</span> <span class="tok-key">char</span>* b) {
+    <span class="tok-key">return</span> (<span class="tok-fn">strcmp</span>(a,b) &lt; <span class="tok-num">0</span>) ? b : a;
+}</code></pre>
+
+  <h3>שילובים</h3>
+  <p><b>עם פולימורפיזם:</b> <code>Vector&lt;Employee*&gt;</code> — וקטור של מצביעים שמאפשר קריאות וירטואליות.<br>
+  <b>ירושה ממחלקת תבנית:</b> אפשר לקבע טיפוס (<code>class B : public A&lt;int&gt;</code>) או להישאר כללי (<code>template&lt;class T&gt; class B : public A&lt;T&gt;</code>).</p>
+
+  <div class="box tip"><span class="label">תבניות מול פולימורפיזם</span>
+  שתיהן מאפשרות קוד כללי. תבניות = "כל טיפוס", נפתרות בזמן קומפילציה (מהיר, אבל מנפח את הקוד — גרסה לכל טיפוס). פולימורפיזם = "משפחת טיפוסים עם אב משותף", נפתר בזמן ריצה.</p></div>
+  <p class="maps">מכסה: מצגת 9</p>
+</section>
+
+<!-- A10 -->
+<section class="lesson" id="a10">
+  <h2 class="title">A10 · קבצים לעומק</h2>
+  <p class="lead">מעבר לכתיבה/קריאה בסיסית: היררכיית הזרמים, מיקום בקובץ, מצבי פתיחה, וקבצים בינאריים.</p>
+
+  <h3>היררכיית הזרמים</h3>
+  <p><code>ostream</code> (הבסיס של <code>cout</code>) הוא גם הבסיס של <code>ofstream</code>. לכן — בזכות פולימורפיזם — אותו <code>operator&lt;&lt;</code> שכתבת עובד גם למסך וגם לקובץ.</p>
+  <div class="callout"><code>ios</code> → <code>ostream</code> → <code>ofstream</code> &nbsp;|&nbsp; <code>ios</code> → <code>istream</code> → <code>ifstream</code></div>
+
+  <h3>מיקום בקובץ (position)</h3>
+  <table class="tbl">
+    <tr><th>פונקציה</th><th>מה עושה</th></tr>
+    <tr><td><code>seekg(pos)</code></td><td>מזיז את סמן ה<b>קריאה</b> (get)</td></tr>
+    <tr><td><code>seekp(pos)</code></td><td>מזיז את סמן ה<b>כתיבה</b> (put)</td></tr>
+    <tr><td><code>tellg()</code>/<code>tellp()</code></td><td>מחזיר את מיקום סמן הקריאה/כתיבה</td></tr>
+    <tr><td><code>getline(buf,n)</code></td><td>קורא עד <code>\n</code> או עד n תווים</td></tr>
+  </table>
+
+  <h3>מצבי פתיחה (open modes)</h3>
+  <p>משלבים דגלים עם <code>|</code>:</p>
+  <table class="tbl">
+    <tr><th>דגל</th><th>משמעות</th></tr>
+    <tr><td><code>ios::app</code></td><td>הוספה בסוף (append) — לא מוחק קיים</td></tr>
+    <tr><td><code>ios::trunc</code></td><td>מוחק את התוכן הקיים</td></tr>
+    <tr><td><code>ios::in</code> / <code>ios::out</code></td><td>קריאה / כתיבה</td></tr>
+    <tr><td><code>ios::binary</code></td><td>מצב בינארי (לא טקסט)</td></tr>
+  </table>
+  <pre><code><span class="tok-type">fstream</span> f(<span class="tok-str">"data.bin"</span>, ios::in | ios::out | ios::binary);</code></pre>
+
+  <h3>קבצים בינאריים וסריאליזציה</h3>
+  <p>כתיבה בינארית קומפקטית ומהירה: כותבים את הבייטים הגולמיים.</p>
+  <pre><code><span class="tok-key">int</span> x = <span class="tok-num">42</span>;
+f.<span class="tok-fn">write</span>((<span class="tok-key">char</span>*)&amp;x, <span class="tok-key">sizeof</span>(x));   <span class="tok-com">// כתיבה בינארית</span>
+f.<span class="tok-fn">read</span>((<span class="tok-key">char</span>*)&amp;x, <span class="tok-key">sizeof</span>(x));    <span class="tok-com">// קריאה בינארית</span></code></pre>
+  <div class="box trap"><span class="label">מלכודת: איך יודעים מה קראנו?</span>
+  כשטוענים אובייקטים פולימורפיים מקובץ, צריך לדעת <b>איזה</b> סוג לבנות. הפתרון: לשמור בקובץ גם <b>קוד-טיפוס</b> (למשל שני תווים מ-<code>typeid</code>) לפני כל רשומה, ולפיו להחליט איזה אובייקט ליצור בטעינה.</p></div>
+  <p class="maps">מכסה: מצגת 8</p>
+</section>
+
+<!-- A11 -->
+<section class="lesson" id="a11">
+  <h2 class="title">A11 · STL לעומק</h2>
+  <p class="lead">מכולות, אלגוריתמים, איטרטורים מבפנים, ו-functors שמוזרקים לאלגוריתמים.</p>
+
+  <h3>שלושת חלקי ה-STL</h3>
+  <p><b>מכולות</b> (containers), <b>אלגוריתמים</b> גנריים, ו<b>אובייקטי פונקציה</b> (functors) שמחברים ביניהם.</p>
+
+  <h3>אלגוריתמים נפוצים (<code>&lt;algorithm&gt;</code>)</h3>
+  <table class="tbl">
+    <tr><th>אלגוריתם</th><th>מה עושה</th></tr>
+    <tr><td><code>for_each</code></td><td>מפעיל פעולה על כל איבר</td></tr>
+    <tr><td><code>count_if</code></td><td>סופר איברים שמקיימים תנאי (predicate)</td></tr>
+    <tr><td><code>find_if</code></td><td>מוצא את הראשון שמקיים תנאי</td></tr>
+    <tr><td><code>sort</code></td><td>ממיין (אפשר לפי comparator מותאם)</td></tr>
+    <tr><td><code>remove_if</code></td><td>מזיז איברים... (ראי מלכודת)</td></tr>
+  </table>
+
+  <div class="box trap"><span class="label">מלכודת קלאסית: remove_if לא מוחק!</span>
+  <code>remove_if</code> לא באמת מוחק איברים מהמכולה (הוא לא יכול — אין לו גישה אליה). הוא <b>מזיז</b> את האיברים שנשארים לתחילת המכולה ומחזיר איטרטור ל"סוף החדש". כדי למחוק באמת חייבים לקרוא אחריו ל-<code>erase</code>. זה נקרא <b>erase-remove idiom</b>:</p>
+  <pre><code>v.<span class="tok-fn">erase</span>( <span class="tok-fn">remove_if</span>(v.<span class="tok-fn">begin</span>(), v.<span class="tok-fn">end</span>(), <span class="tok-fn">IsEven</span>()), v.<span class="tok-fn">end</span>() );</code></pre>
+  </div>
+
+  <h3>Functors מוזרקים לאלגוריתמים</h3>
+  <p>functor = struct עם <code>operator()</code>. מעבירים אותו לאלגוריתם כדי לקבוע את הלוגיקה בלי לשנות את המכולה.</p>
+  <pre><code><span class="tok-key">struct</span> <span class="tok-type">OlderThan</span> {
+    <span class="tok-key">int</span> age;
+    <span class="tok-fn">OlderThan</span>(<span class="tok-key">int</span> a):age(a){}
+    <span class="tok-key">bool</span> <span class="tok-fn">operator()</span>(<span class="tok-key">const</span> <span class="tok-type">Student</span>&amp; s) <span class="tok-key">const</span> { <span class="tok-key">return</span> s.age &gt; age; }
+};
+<span class="tok-key">int</span> n = <span class="tok-fn">count_if</span>(v.<span class="tok-fn">begin</span>(), v.<span class="tok-fn">end</span>(), <span class="tok-fn">OlderThan</span>(<span class="tok-num">18</span>));</code></pre>
+
+  <h3>איטרטורים — הרעיון מבפנים</h3>
+  <p>מצביע גולמי הוא איטרטור מושלם ל<b>מערך</b> (יש לו <code>++</code>, <code>*</code>, <code>==</code>). אבל על רשימה מקושרת מצביע נכשל, כי הזיכרון לא רציף. לכן <b>כל מבנה נתונים מספק איטרטור משלו</b> שמעמיס את אותם אופרטורים — וכך אלגוריתם גנרי אחד (כמו <code>find</code>) עובד על כולם בלי לדעת מה המבנה הפנימי.</p>
+  <div class="box tip"><span class="label">מודל האיטרטור</span>
+  <code>begin()</code> = האיבר הראשון, <code>end()</code> = "אחרי האחרון". לולאה טיפוסית: <code>for(it=c.begin(); it!=c.end(); ++it) use(*it);</code></p></div>
+  <p class="maps">מכסה: מצגות 10, 11</p>
+</section>
+
+<!-- A12 -->
+<section class="lesson" id="a12">
+  <h2 class="title">A12 · Reference Counting ו-Copy-on-Write</h2>
+  <p class="lead">הפרויקט המסכם של הקורס: איך לחלוק נתונים בין אובייקטים בבטחה ובלי בזבוז זיכרון.</p>
+
+  <h3>הבעיה</h3>
+  <p>העתקה עמוקה (deep copy) בטוחה אבל מבזבזת: אם חמש מחרוזות מכילות אותו טקסט, יש חמישה עותקים. העתקה שטחית חוסכת זיכרון אבל מסוכנת: מי משחרר את הנתון המשותף? מי שישחרר ראשון ישאיר לאחרים מצביע תלוי.</p>
+
+  <h3>הפתרון: ספירת התייחסויות (Reference Counting)</h3>
+  <p>כל האובייקטים חולקים את אותו נתון + <b>מונה משותף</b> שסופר כמה מצביעים אליו. יוצרים עותק ⟵ המונה עולה. אובייקט נהרס ⟵ המונה יורד. כשהמונה מגיע ל-0 ⟵ משחררים באמת.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">RCString</span> {
+    <span class="tok-key">char</span>* str;
+    <span class="tok-key">int</span>* refCount;   <span class="tok-com">// מונה משותף — לכן מצביע</span>
+    <span class="tok-key">void</span> <span class="tok-fn">detach</span>() {     <span class="tok-com">// בהרסן / לפני השמה חדשה</span>
+        <span class="tok-key">if</span> (--(*refCount) == <span class="tok-num">0</span>) { <span class="tok-key">delete</span>[] str; <span class="tok-key">delete</span> refCount; }
+    }
+<span class="tok-key">public</span>:
+    <span class="tok-fn">RCString</span>(<span class="tok-key">const</span> <span class="tok-type">RCString</span>&amp; o)      <span class="tok-com">// העתקה = חלוקה + הגדלת מונה</span>
+      : str(o.str), refCount(o.refCount) { (*refCount)++; }
+    ~<span class="tok-fn">RCString</span>() { <span class="tok-fn">detach</span>(); }
+};</code></pre>
+
+  <h3>Copy-on-Write (COW) — העתקה בכתיבה</h3>
+  <div class="box key"><span class="label">הרעיון</span>
+  כל עוד רק <b>קוראים</b> — חולקים את אותו נתון (חסכוני). ברגע שמישהו רוצה <b>לשנות</b> והנתון משותף (<code>refCount &gt; 1</code>) — יוצרים לו עותק פרטי <b>לפני</b> השינוי, כדי לא לפגוע באחרים.</p></div>
+  <pre><code><span class="tok-com">// operator[] לא-const → כתיבה אפשרית → חייב לשכפל אם משותף</span>
+<span class="tok-key">char</span>&amp; <span class="tok-fn">operator[]</span>(<span class="tok-key">int</span> i) {
+    <span class="tok-key">if</span> (*refCount &gt; <span class="tok-num">1</span>) {        <span class="tok-com">// הנתון משותף → משכפלים</span>
+        (*refCount)--;
+        str = <span class="tok-fn">cloneBuffer</span>(str);   <span class="tok-com">// עותק פרטי</span>
+        refCount = <span class="tok-key">new</span> <span class="tok-key">int</span>(<span class="tok-num">1</span>);
+    }
+    <span class="tok-key">return</span> str[i];             <span class="tok-com">// עכשיו בטוח לשנות</span>
+}
+<span class="tok-com">// גרסת ה-const מחזירה עותק לקריאה בלבד ולא משכפלת</span></code></pre>
+  <div class="box tip"><span class="label">קשר לעולם האמיתי</span>
+  זה בדיוק העיקרון שמאחורי <code>shared_ptr</code> ומאחורי מימושים ישנים של <code>std::string</code>. הבנת המנגנון הזה מראה שליטה אמיתית ב-Rule of Three ובניהול משאבים.</p></div>
+  <p class="maps">מכסה: מצגת 11</p>
+</section>
+
+<!-- QUIZ -->
+<section class="lesson" id="quiz">
+  <h2 class="title">בוחן מתקדם · 15 שאלות</h2>
+  <p class="lead">שאלות אמריקאיות חדשות על הנושאים המתקדמים. לחצי על תשובה כדי לקבל סימון והסבר מלא.</p>
+
+  <div class="scorebar">
+    <span>ניקוד: <b id="score">0</b> / 15</span>
+    <div class="progress"><i id="bar"></i></div>
+    <button class="btn ghost" onclick="resetQuiz()">איפוס</button>
+  </div>
+
+  <div id="quizHost"></div>
+  <div class="box key" id="finalMsg" style="display:none"></div>
+</section>
+
+<footer>
+  נספח "נושאים מתקדמים" — משלים את המדריך הראשי לכיסוי מלא של מצגות הקורס "השלמות תכנות מונחה עצמים ב-C++".
+  מומלץ להריץ את קטעי הקוד בעצמך כדי לוודא הבנה.
+</footer>
+
+</main>
+</div>
+
+<script>
+const links=document.querySelectorAll('nav.side a');
+const sections=document.querySelectorAll('section.lesson');
+function go(id){
+  sections.forEach(s=>s.classList.toggle('show',s.id===id));
+  links.forEach(a=>a.classList.toggle('active',a.dataset.go===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+links.forEach(a=>a.addEventListener('click',()=>go(a.dataset.go)));
+
+const QUESTIONS=[
+ {q:'מחלקה מנהלת <code>char* data</code> עם new. לא מומש <code>operator=</code>. מה עושה ההשמה <code>b = a;</code> שהקומפיילר מייצר אוטומטית?',
+  opts:['מבצעת העתקה עמוקה — לכל אובייקט מערך משלו.','מבצעת העתקה שטחית — שני האובייקטים מצביעים לאותו מערך, ובהריסה תהיה מחיקה כפולה.','שגיאת קומפילציה — חובה לממש operator= ידנית.','לא עושה כלום — ההשמה מתעלמת מהמצביע.'],
+  ans:1, exp:'operator= ברירת המחדל מעתיק חבר-חבר (memberwise) — כלומר מעתיק את <b>ערך המצביע</b>, לא את מה שהוא מצביע עליו (העתקה שטחית). התוצאה: שני אובייקטים חולקים אותו מערך, וכששניהם ייהרסו יתבצע <code>delete[]</code> כפול על אותה כתובת. זו הסיבה ל-Rule of Three.'},
+
+ {q:'למה חשובה בדיקת <code>if(this != &other)</code> בתחילת operator=?<pre><code>FVector& operator=(const FVector& other){\n    // כאן\n    delete[] items;\n    items = new float[other.size];\n    ...\n}</code></pre>',
+  opts:['רק לצורך יעילות — היא לא הכרחית לנכונות.','כדי לתמוך בשרשור a = b = c.','כי בלעדיה, <code>a = a</code> ימחק את המערך של a לפני שמעתיקים ממנו — כלומר נמחק את המקור.','כדי למנוע דליפת זיכרון בלבד, לא קריסה.'],
+  ans:2, exp:'בהשמה עצמית <code>a = a</code>, המצביע <code>other</code> הוא בעצם <code>this</code>. בלי הבדיקה, <code>delete[] items</code> משחרר את המערך, ואז מנסים להעתיק ממנו — אבל הוא כבר מחוק. הבדיקה מדלגת על כל העבודה כשהמקור והיעד זהים.'},
+
+ {q:'הטיפוס Money עם <code>operator-</code> ממומש כ<b>מתודה</b>. איזו קריאה <b>לא</b> תתקמפל?',
+  opts:['a - b (שני אובייקטי Money)','a - 5 (המרה של 5 ל-Money)','5 - a','שלושתן מתקמפלות'],
+  ans:2, exp:'כשאופרטור בינארי ממומש כמתודה, האופרנד ה<b>שמאלי</b> חייב להיות אובייקט המחלקה. ב-<code>5 - a</code> השמאלי הוא <code>int</code> ← אין מתודה מתאימה על int ← שגיאת קומפילציה. הפתרון: לממש את operator- כפונקציה גלובלית/friend. (a - 5 עובד כי 5 מומר ל-Money דרך בנאי חד-פרמטרי.)'},
+
+ {q:'מה מדפיס הקוד?<pre><code>class Money {\n    int agorot;\npublic:\n    Money(int a):agorot(a){}\n    operator int() const { return agorot; }\n};\nint main(){ Money m(150); int x = m + 50; cout << x; }</code></pre>',
+  opts:['שגיאת קומפילציה — אי אפשר לחבר Money ל-int.','200 — אופרטור ההמרה ממיר את m ל-int (150), ואז 150+50.','50 — ה-Money מתעלם.','שגיאת ריצה.'],
+  ans:1, exp:'<code>operator int()</code> הוא אופרטור המרה: הוא מאפשר להשתמש ב-Money במקום שבו מצופה int. בביטוי <code>m + 50</code> הקומפיילר ממיר את m ל-int (מחזיר 150), מחשב 150+50=200. תוצאה: <b>200</b>.'},
+
+ {q:'מה נכון לגבי סדר בלוקי ה-catch?<pre><code>try { risky(); }\ncatch(...) { /* A */ }\ncatch(int) { /* B */ }</code></pre>',
+  opts:['תקין — catch(int) עדיין ייתפס לפי הטיפוס.','שגיאת קומפילציה/אזהרה — <code>catch(...)</code> חייב להיות אחרון, אחרת הוא בולע כל חריג והבלוקים אחריו לעולם לא יגיעו.','catch(int) ירוץ תמיד ראשון כי הוא ספציפי.','שני הבלוקים ירוצו ברצף.'],
+  ans:1, exp:'בלוקי catch נבדקים <b>לפי הסדר</b>. <code>catch(...)</code> תופס כל חריג, ולכן אם הוא מופיע ראשון, אף בלוק אחריו לא יכול להיות מושג — קוד מת. הכלל: catch-all חייב להיות האחרון.'},
+
+ {q:'מה מדפיס הקוד?<pre><code>class Circle {\n    double r;\n    mutable int calls = 0;\npublic:\n    Circle(double x):r(x){}\n    double area() const { calls++; return 3.14*r*r; }\n    int getCalls() const { return calls; }\n};\nint main(){\n    const Circle c(2);\n    c.area(); c.area();\n    cout << c.getCalls();\n}</code></pre>',
+  opts:['שגיאת קומפילציה — אסור לשנות calls במתודת const.','שגיאת קומפילציה — c הוא const ואי אפשר לקרוא ל-area.','2 — calls הוא mutable, ולכן ניתן לעדכון גם במתודת const ועל אובייקט const.','0 — השינוי ל-calls לא נשמר.'],
+  ans:2, exp:'שדה <code>mutable</code> הוא החריג לכלל ה-const: מותר לשנותו גם בתוך מתודת <code>const</code> וגם על אובייקט <code>const</code>. לכן שתי הקריאות ל-area() מגדילות את calls ל-2. זהו בדיוק דפוס ה-caching.'},
+
+ {q:'הקוד מתקמפל אך נכשל בקישור (linker error). מה הסיבה?<pre><code>class Player {\n    static int count;\npublic:\n    Player(){ count++; }\n    static int get(){ return count; }\n};\nint main(){ Player p; cout << Player::get(); }</code></pre>',
+  opts:['חסרה הגדרה של השדה הסטטי מחוץ למחלקה: <code>int Player::count = 0;</code>','אסור לקרוא ל-get() בלי אובייקט.','count חייב להיות public.','הבנאי לא יכול לשנות שדה static.'],
+  ans:0, exp:'הכרזה על <code>static int count;</code> בתוך המחלקה לא מקצה זיכרון. חייבים שורת הגדרה יחידה מחוץ למחלקה: <code>int Player::count = 0;</code>. בלעדיה הקומפיילר לא מוצא היכן השדה "חי" ← שגיאת קישור.'},
+
+ {q:'מה קורה בקריאה <code>b.f()</code>?<pre><code>class A { public: void f(){cout<<"A";} };\nclass B : public A { public: void f(int x){cout<<"B";} };\nint main(){ B b; b.f(); }</code></pre>',
+  opts:['מדפיס A — הגרסה של הבסיס נקראת.','מדפיס B.','שגיאת קומפילציה — B::f(int) מסתיר את A::f(), ולכן f() ללא פרמטר אינו נגיש דרך b.','מדפיס AB.'],
+  ans:2, exp:'הסתרת שם (name hiding): ברגע ש-B מגדירה מתודה בשם <code>f</code>, היא מסתירה את <b>כל</b> העומסים של f מהבסיס — כולל <code>f()</code> חסר הפרמטרים. לכן <code>b.f()</code> לא מתקמפל. פתרונות: <code>b.A::f()</code> או <code>using A::f;</code> בתוך B.'},
+
+ {q:'מה נכון לגבי הקוד?<pre><code>class A { public: void g(){} int x; };\nclass B : private A {};\nint main(){ B b; b.g(); }</code></pre>',
+  opts:['תקין — g היה public ב-A.','שגיאת קומפילציה — בירושת private, g (שהיה public) הפך ל-private ב-B, ולכן אינו נגיש דרך b.','תקין, אבל x לא נגיש.','שגיאת ריצה.'],
+  ans:1, exp:'בירושת <code>private</code>, כל החברים הציבוריים והמוגנים של הבסיס הופכים ל-private במחלקה היורשת. לכן <code>b.g()</code> מבחוץ נכשל. כדי לחשוף מחדש: <code>using A::g;</code> באזור ה-public של B.'},
+
+ {q:'איך C++ מחליטה איזו גרסה של מתודה <code>virtual</code> להריץ דרך <code>p->g()</code>?',
+  opts:['לפי הטיפוס המוצהר של p, בזמן קומפילציה.','שולפת את כתובת הפונקציה מטבלת הפונקציות הווירטואליות (vtable) של האובייקט האמיתי, בזמן ריצה.','תמיד מריצה את גרסת מחלקת הבסיס.','לפי סדר ההכרזה של המחלקות.'],
+  ans:1, exp:'לכל מחלקה עם מתודה virtual יש vtable — מערך כתובות של המתודות הווירטואליות. כל אובייקט מחזיק מצביע נסתר (vfptr) ל-vtable של המחלקה האמיתית שלו. הקריאה <code>p->g()</code> מתורגמת לחיפוש הכתובת בטבלה בזמן ריצה, ולכן מגיעה לגרסה הנכונה לפי הטיפוס הדינמי.'},
+
+ {q:'איזו הצהרה נכונה להגדרת מתודה של מחלקת תבנית <b>מחוץ</b> למחלקה?<pre><code>template <class T> class Vector {\n    void print() const;\n};</code></pre>',
+  opts:['<code>void Vector::print() const {}</code>','<code>template <class T> void Vector<T>::print() const {}</code>','<code>void Vector<T>::print() const {}</code>','<code>template void Vector::print() const {}</code>'],
+  ans:1, exp:'כשמגדירים מתודה של מחלקת תבנית מחוץ למחלקה, חובה לחזור על <code>template &lt;class T&gt;</code> ולציין את שם המחלקה עם הפרמטר: <code>Vector&lt;T&gt;::print</code>. ההשמטות בשאר האפשרויות גורמות לשגיאת קומפילציה.'},
+
+ {q:'מה מדפיס הקוד?<pre><code>vector<int> v = {1,2,3,4};\nauto newEnd = remove_if(v.begin(), v.end(),\n                        [](int x){ return x%2==0; });\ncout << v.size();</code></pre>',
+  opts:['2 — remove_if מחק את הזוגיים.','4 — remove_if לא מוחק איברים מהמכולה; הוא רק מזיז ומחזיר איטרטור לסוף החדש. הגודל לא משתנה בלי erase.','שגיאת קומפילציה — lambda לא חוקי כאן.','0 — כל האיברים הוסרו.'],
+  ans:1, exp:'<code>remove_if</code> לא יכול לשנות את גודל המכולה (אין לו גישה אליה). הוא מזיז את האיברים שנשארים לתחילת הווקטור ומחזיר איטרטור לסוף הלוגי החדש; ה-<code>size()</code> נשאר 4. כדי למחוק באמת: <code>v.erase(newEnd, v.end())</code> (erase-remove idiom).'},
+
+ {q:'מהו functor?',
+  opts:['פונקציה גלובלית שמקבלת מצביע לפונקציה.','אובייקט של מחלקה שמעמיסה את <code>operator()</code>, כך שאפשר "לקרוא" לו כמו פונקציה.','מילה נרדפת ל-lambda בלבד.','סוג מיוחד של מצביע.'],
+  ans:1, exp:'functor (אובייקט פונקציה) הוא אובייקט ממחלקה שמימשה <code>operator()</code>. לכן אפשר לכתוב <code>f(args)</code> על האובייקט. יתרונו על פונקציה רגילה: הוא יכול לשמור מצב (שדות). זהו הבסיס להזרקת לוגיקה לאלגוריתמים של STL. (lambda הוא בעצם functor שהקומפיילר יוצר.)'},
+
+ {q:'בעיצוב Reference Counting, מתי משוחרר הנתון המשותף (<code>delete[] str</code>)?',
+  opts:['בכל פעם שאובייקט כלשהו נהרס.','רק כשמונה ההתייחסויות (refCount) יורד ל-0.','אף פעם — הנתון נשאר עד סוף התוכנית.','כשנוצר עותק חדש.'],
+  ans:1, exp:'ברעיון ה-reference counting, כל האובייקטים חולקים נתון ומונה משותף. יצירת עותק מגדילה את המונה; הריסת אובייקט מקטינה אותו. השחרור האמיתי (<code>delete[]</code>) מתבצע <b>רק</b> כשהמונה מגיע ל-0 — כלומר כשאין יותר אף אובייקט שמצביע לנתון.'},
+
+ {q:'בטכניקת Copy-on-Write, מדוע ה-<code>operator[]</code> הלא-const משכפל את החוצץ כאשר <code>refCount > 1</code>?',
+  opts:['כדי לחסוך זיכרון.','כי גישה לא-const עלולה לשנות את הנתון, ואם הוא משותף — שינוי יפגע בכל שאר האובייקטים; לכן משכפלים עותק פרטי לפני השינוי.','כי const אוסר על שיתוף.','זו טעות — אין צורך לשכפל.'],
+  ans:1, exp:'<code>operator[]</code> לא-const מחזיר reference בר-כתיבה, כלומר מאפשר שינוי. אם הנתון משותף (refCount &gt; 1), שינוי דרך אובייקט אחד "יזלוג" לכל האחרים. לכן לפני שמאפשרים כתיבה, יוצרים לאובייקט הזה עותק פרטי — "העתקה בכתיבה". גרסת ה-const, שרק קוראת, לא צריכה לשכפל.'}
+];
+
+const host=document.getElementById('quizHost');
+let answered=new Array(QUESTIONS.length).fill(false);
+const letters=['א','ב','ג','ד'];
+function render(){
+  host.innerHTML='';
+  QUESTIONS.forEach((item,qi)=>{
+    const card=document.createElement('div');card.className='q';
+    card.innerHTML='<div class="qnum">שאלה '+(qi+1)+'</div><div class="qtext">'+item.q+'</div>';
+    item.opts.forEach((o,oi)=>{
+      const el=document.createElement('div');el.className='opt';
+      el.innerHTML='<span class="letter">'+letters[oi]+'.</span>'+o;
+      el.onclick=()=>choose(qi,oi,card);
+      card.appendChild(el);
+    });
+    const ex=document.createElement('div');ex.className='explain';
+    ex.innerHTML='<span class="ans">התשובה הנכונה: '+letters[item.ans]+'</span><br>'+item.exp;
+    card.appendChild(ex);
+    host.appendChild(card);
+  });
+}
+let score=0;
+function choose(qi,oi,card){
+  if(answered[qi])return;
+  answered[qi]=true;
+  const opts=card.querySelectorAll('.opt');
+  opts.forEach((el,i)=>{
+    el.style.cursor='default';
+    if(i===QUESTIONS[qi].ans)el.classList.add('correct');
+    else if(i===oi)el.classList.add('wrong');
+  });
+  card.querySelector('.explain').classList.add('show');
+  if(oi===QUESTIONS[qi].ans)score++;
+  updateScore();
+}
+function updateScore(){
+  document.getElementById('score').textContent=score;
+  const done=answered.filter(Boolean).length;
+  document.getElementById('bar').style.width=(done/QUESTIONS.length*100)+'%';
+  if(done===QUESTIONS.length){
+    const fm=document.getElementById('finalMsg');
+    fm.style.display='block';
+    let msg;
+    if(score>=13)msg='מצוין! '+score+'/15 — שליטה מרשימה גם בחומר המתקדם. 🎓';
+    else if(score>=10)msg='יפה מאוד! '+score+'/15. חזרי על המודולים של השאלות שטעית בהן.';
+    else msg='התחלה טובה — '+score+'/15. החומר כאן מתקדם; עברי שוב על המודולים הרלוונטיים ואז חזרי לבוחן.';
+    fm.innerHTML='<span class="label">סיימת את הבוחן המתקדם</span>'+msg;
+    fm.scrollIntoView({behavior:'smooth'});
+  }
+}
+function resetQuiz(){
+  score=0;answered=new Array(QUESTIONS.length).fill(false);
+  document.getElementById('finalMsg').style.display='none';
+  render();updateScore();
+}
+render();updateScore();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תכנות מונחה עצמים ב-C++ — מרכז למידה</title>
+<style>
+  :root{
+    --bg:#0f1220; --panel:#171b2e; --panel2:#1e2338; --ink:#e9ecf6; --muted:#a7afce;
+    --brand:#6c8cff; --brand2:#4ad6b8; --purple:#c084fc; --line:#2a3050;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,"Arial",sans-serif;line-height:1.7;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
+  .wrap{max-width:760px;width:100%;text-align:center}
+  .kicker{color:var(--brand2);font-size:14px;letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:12px}
+  h1{font-size:38px;margin:0 0 14px;color:#fff;line-height:1.25}
+  .lead{color:var(--muted);font-size:18px;margin:0 auto 40px;max-width:560px}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:640px){.cards{grid-template-columns:1fr}h1{font-size:30px}}
+  a.card{display:block;text-decoration:none;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px 24px;text-align:right;transition:transform .15s ease,border-color .15s ease,background .15s ease}
+  a.card:hover{transform:translateY(-4px);background:var(--panel2)}
+  a.card.main:hover{border-color:var(--brand)}
+  a.card.app:hover{border-color:var(--purple)}
+  .card .tag{display:inline-block;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:14px}
+  .card.main .tag{background:rgba(108,140,255,.15);color:var(--brand)}
+  .card.app .tag{background:rgba(192,132,252,.15);color:var(--purple)}
+  .card h2{font-size:22px;margin:0 0 8px;color:#fff}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  .card .go{margin-top:16px;font-weight:700;font-size:15px}
+  .card.main .go{color:var(--brand)}
+  .card.app .go{color:var(--purple)}
+  footer{margin-top:44px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="kicker">מרכז למידה</div>
+    <h1>תכנות מונחה עצמים ב-C++</h1>
+    <p class="lead">מדריך למידה אינטראקטיבי המכסה את יסודות ה-OOP בשפת C++, מהמוטיבציה ועד נושאים מתקדמים.</p>
+
+    <div class="cards">
+      <a class="card main" href="guide.html">
+        <span class="tag">מדריך ראשי</span>
+        <h2>מדריך למידה</h2>
+        <p>שיעורים מלאים: מחלקות, בנאים, הורשה, פולימורפיזם, תבניות, STL ועוד.</p>
+        <div class="go">כניסה למדריך ←</div>
+      </a>
+
+      <a class="card app" href="appendix.html">
+        <span class="tag">נספח</span>
+        <h2>נושאים מתקדמים</h2>
+        <p>הרחבות ונושאים מתקדמים ב-OOP למי שרוצה להעמיק.</p>
+        <div class="go">כניסה לנספח ←</div>
+      </a>
+    </div>
+
+    <footer>נבנה כחומר עזר ללימוד · C++ OOP</footer>
+  </div>
+</body>
+</html>
