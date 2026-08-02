@@ -1262,7 +1262,7 @@ const QUESTIONS=[
   opts:['הקוד מתקמפל, ו-x מאותחל ל-0.','הקוד מתקמפל, אבל x יקבל ערך אקראי.','שגיאת קומפילציה — קיים בנאי שמקבל int ואין בנאי ברירת מחדל.','שגיאת ריצה, כי לא הופעל delete על p.'],
   ans:2, exp:'ברגע שהוגדר בנאי כלשהו (כאן <code>Point(int)</code>), הקומפיילר <b>מפסיק</b> לייצר בנאי ברירת מחדל. לכן <code>Point p;</code> שדורש בנאי ריק — לא מתקמפל. א/ב שגויות כי הקוד בכלל לא עובר קומפילציה; ד שגוי כי אין כאן הקצאה דינמית.'},
 
- {q:'איזה שינוי מייצג בצורה הטובה ביותר את עקרון ההסתרה?<pre><code>class Student {\npublic:\n    int age;\n};\nvoid update(Student& s, int x) { s.age = x; }</code></pre>',
+ {q:'איזה שינוי מייצג בצורה הטובה ביותר את עקרון ההסתרה?<pre><code>class Student {\npublic:\n    int age;\n};\nvoid update(Student&amp; s, int x) { s.age = x; }</code></pre>',
   opts:['להעביר את בדיקת התקינות לפונקציה גלובלית.','להפוך את age ל-private, ולאפשר שינוי דרך מתודה שבודקת תקינות.','להחליף int ב-unsigned int בלבד.','להוסיף הערה שמסבירה שאין להזין גיל שלילי.'],
   ans:1, exp:'הסתרת מידע = שדה <code>private</code> + מתודה (setter) שמבצעת בקרת תקינות. א לא מסתיר את השדה; ג לא בודק חוקיות אמיתית (unsigned רק מונע שליליים אך גולש); ד הערה לא אוכפת דבר.'},
 
@@ -1270,23 +1270,23 @@ const QUESTIONS=[
   opts:['print(6) תקינה — בנאי עם פרמטר אחד הוא תמיד המרה לא מפורשת.','התוכנית תרוץ, אבל p1 יועתק פעמיים.','שגיאת ריצה, כי print מקבלת אובייקט by value.','שגיאת קומפילציה ב-print(6) — explicit מונע המרה לא מפורשת מ-int ל-Point.'],
   ans:3, exp:'<code>explicit</code> חוסם המרה אוטומטית מ-<code>int</code> ל-<code>Point</code>. <code>print(6)</code> דורש המרה כזו ← שגיאת קומפילציה. <code>print(p1)</code> תקין. א סותר בדיוק את מה ש-explicit עושה.'},
 
- {q:'מה יודפס?<pre><code>struct A { A(){cout<<"A";} ~A(){cout<<"a";} };\nstruct B : public A { B(){cout<<"B";} ~B(){cout<<"b";} };\nint main() { B b; }</code></pre>',
+ {q:'מה יודפס?<pre><code>struct A { A(){cout&lt;&lt;"A";} ~A(){cout&lt;&lt;"a";} };\nstruct B : public A { B(){cout&lt;&lt;"B";} ~B(){cout&lt;&lt;"b";} };\nint main() { B b; }</code></pre>',
   opts:['ABba','BAab','ABab','BAba'],
   ans:0, exp:'בנייה מלמעלה למטה: A ואז B ← "AB". הריסה הפוך: ~B ואז ~A ← "ba". סה"כ <b>ABba</b>.'},
 
- {q:'הקוד לא מאפשר <code>a[0]=7</code>. מהו התיקון?<pre><code>class Array {\n    int data[3];\npublic:\n    int operator[](int i) { return data[i]; }\n};</code></pre>',
+ {q:'הקוד לא מאפשר <code>a[0]=7</code> (שגיאת קומפילציה בשורת ה-main). מהו התיקון?<pre><code>class Array {\n    int data[3];\npublic:\n    int operator[](int i) { return data[i]; }\n};\nint main() {\n    Array a;\n    a[0] = 7;   // כאן נכשל\n}</code></pre>',
   opts:['להפוך את data ל-public.','להחזיר const int& מ-operator[].','להחזיר int& מ-operator[].','להוסיף בנאי ברירת מחדל שמאתחל את המערך.'],
   ans:2, exp:'כדי לאפשר <b>השמה</b> <code>a[0]=7</code>, האופרטור חייב להחזיר reference בר-כתיבה: <code>int&</code>. עותק (<code>int</code>) הוא ערך זמני שאי אפשר להשים אליו; <code>const int&</code> מאפשר קריאה בלבד.'},
 
- {q:'מה יודפס?<pre><code>class Base {\npublic:\n    void f(){cout<<"Bf";}\n    virtual void g(){cout<<"Bg";}\n};\nclass Derived : public Base {\npublic:\n    void f(){cout<<"Df";}\n    void g(){cout<<"Dg";}\n};\nint main() {\n    Derived d; Base* p=&d;\n    p->f(); p->g();\n}</code></pre>',
+ {q:'מה יודפס?<pre><code>class Base {\npublic:\n    void f(){cout&lt;&lt;"Bf";}\n    virtual void g(){cout&lt;&lt;"Bg";}\n};\nclass Derived : public Base {\npublic:\n    void f(){cout&lt;&lt;"Df";}\n    void g(){cout&lt;&lt;"Dg";}\n};\nint main() {\n    Derived d; Base* p=&amp;d;\n    p-&gt;f(); p-&gt;g();\n}</code></pre>',
   opts:['DfDg','BfDg','BfBg','DfBg'],
   ans:1, exp:'<code>f</code> אינה virtual ← נבחרת לפי הטיפוס הסטטי <code>Base*</code> ← "Bf". <code>g</code> היא virtual ← נבחרת לפי האובייקט האמיתי Derived ← "Dg". סה"כ <b>BfDg</b>.'},
 
- {q:'מה יקרה?<pre><code>template <class T>\nT maxT(T a, T b) { return (a<b)?b:a; }\nint main() { cout << maxT(1, 2.5); }</code></pre>',
+ {q:'מה יקרה?<pre><code>template &lt;class T&gt;\nT maxT(T a, T b) { return (a&lt;b)?b:a; }\nint main() { cout &lt;&lt; maxT(1, 2.5); }</code></pre>',
   opts:['יודפס 2.5 — T יוסק כ-double.','יודפס 2 — T יוסק כ-int.','הקוד תקין רק אם מחליפים T ב-auto.','שגיאת קומפילציה — אי אפשר להסיק T יחיד משני ארגומנטים מטיפוסים שונים.'],
   ans:3, exp:'שני הפרמטרים חייבים להיות אותו <code>T</code>, אך הארגומנטים הם <code>int</code> ו-<code>double</code>. הקומפיילר לא מבצע המרה אוטומטית כדי ליישר טיפוסים ב-deduction ← <b>שגיאת קומפילציה</b>.'},
 
- {q:'מהי הבעיה המהותית?<pre><code>class Base {\npublic:\n    ~Base(){cout<<"B";}\n};\nclass Derived : public Base {\n    int* p;\npublic:\n    Derived(){p=new int[10];}\n    ~Derived(){delete[] p; cout<<"D";}\n};\nint main() {\n    Base* b = new Derived;\n    delete b;\n}</code></pre>',
+ {q:'מהי הבעיה המהותית?<pre><code>class Base {\npublic:\n    ~Base(){cout&lt;&lt;"B";}\n};\nclass Derived : public Base {\n    int* p;\npublic:\n    Derived(){p=new int[10];}\n    ~Derived(){delete[] p; cout&lt;&lt;"D";}\n};\nint main() {\n    Base* b = new Derived;\n    delete b;\n}</code></pre>',
   opts:['מחיקה דרך Base* כשאין הורס וירטואלי ל-Base — המשאב של Derived עלול לא להשתחרר.','הקוד תקין — הורס הבסיס תמיד נקרא לפני היורש.','התיקון היחיד הוא להחליף new ב-malloc.','הבעיה היא ש-Derived לא הגדירה בנאי העתקה.'],
   ans:0, exp:'הרסן <code>Base</code> אינו <code>virtual</code>. <code>delete b;</code> דרך <code>Base*</code> יריץ רק את הרסן Base ← הרסן Derived לא ירוץ ← <code>delete[] p</code> לא מתבצע ← דליפת זיכרון. הפתרון: <code>virtual ~Base()</code>.'},
 
@@ -1294,11 +1294,11 @@ const QUESTIONS=[
   opts:['הקוד מתקמפל — x היה public ב-A.','שגיאת קומפילציה ב-B::f — x לא נגיש גם ליורשת.','שגיאת קומפילציה ב-main — protected inheritance הפכה את x ל-protected ביחס ל-B.','שגיאת ריצה בלבד — אין אתחול ל-x.'],
   ans:2, exp:'בירושת <code>protected</code>, שדה שהיה public בבסיס הופך ל-protected ביורשת. לכן <b>בתוך</b> <code>B::f</code> מותר לגשת ל-x ול-y, אבל <b>מבחוץ</b> <code>b.x</code> ב-main נכשל ← שגיאת קומפילציה.'},
 
- {q:'הקוד מנסה לאפשר <code>cout << p</code>. מהו התיקון העקרוני?<pre><code>class Point {\n    int x;\npublic:\n    Point(int ax):x(ax){}\n    ostream& operator<<(ostream& out) const {\n        out<<x; return out;\n    }\n};\nint main(){ Point p(3); cout<<p; }</code></pre>',
+ {q:'הקוד מנסה לאפשר <code>cout << p</code>. מהו התיקון העקרוני?<pre><code>class Point {\n    int x;\npublic:\n    Point(int ax):x(ax){}\n    ostream&amp; operator&lt;&lt;(ostream&amp; out) const {\n        out&lt;&lt;x; return out;\n    }\n};\nint main(){ Point p(3); cout&lt;&lt;p; }</code></pre>',
   opts:['להחליף cout ב-cerr.','לממש operator<< כפונקציה חופשית, לרוב friend, המקבלת ostream& ו-const Point&.','להחזיר void מ-operator<<.','להוסיף virtual לפני operator<<.'],
   ans:1, exp:'כשמממשים <code>operator<<</code> כמתודה, האופרנד השמאלי חייב להיות האובייקט (<code>p<<cout</code>). כדי לאפשר <code>cout<<p</code> צריך פונקציה <b>חופשית</b> (לרוב <code>friend</code>) עם חתימה <code>ostream& operator<<(ostream&, const Point&)</code>.'},
 
- {q:'מה יודפס?<pre><code>struct A { A(){cout<<"A";} ~A(){cout<<"a";} };\nstruct B { B(){cout<<"B";} ~B(){cout<<"b";} };\nstruct C : public A, public B {\n    C(){cout<<"C";} ~C(){cout<<"c";}\n};\nint main() { C c; }</code></pre>',
+ {q:'מה יודפס?<pre><code>struct A { A(){cout&lt;&lt;"A";} ~A(){cout&lt;&lt;"a";} };\nstruct B { B(){cout&lt;&lt;"B";} ~B(){cout&lt;&lt;"b";} };\nstruct C : public A, public B {\n    C(){cout&lt;&lt;"C";} ~C(){cout&lt;&lt;"c";}\n};\nint main() { C c; }</code></pre>',
   opts:['BACabc','ABCabc','CBAabc','ABCcba'],
   ans:3, exp:'בנייה לפי סדר ההכרזה: A, B, ואז C ← "ABC". הריסה הפוך: ~C, ~B, ~A ← "cba". סה"כ <b>ABCcba</b>.'},
 
@@ -1306,19 +1306,19 @@ const QUESTIONS=[
   opts:['הקוד מתקמפל, ול-d יש x יחיד.','הקוד מתקמפל, אבל d.x יפנה תמיד ל-B::x.','שגיאת קומפילציה — ל-D שני תתי-אובייקטים מסוג A והשם x דו-משמעי.','שגיאת ריצה — הבעיה מתגלה רק אחרי הקצאה דינמית.'],
   ans:2, exp:'יהלום המוות: D יורשת מ-B ומ-C, ושתיהן מ-A ← ל-D <b>שני עותקים</b> של A. הפנייה <code>d.x</code> דו-משמעית ← שגיאת קומפילציה. הפתרון הוא ירושה <code>virtual</code>.'},
 
- {q:'מה יודפס?<pre><code>class Counter {\n    int x;\npublic:\n    Counter(int v):x(v){}\n    Counter& operator++(){ ++x; return *this; }\n    Counter operator++(int){ Counter t=*this; ++x; return t; }\n    int get() const { return x; }\n};\nint main() {\n    Counter c(1);\n    cout << (c++).get() << " " << (++c).get();\n}</code></pre>',
+ {q:'מה יודפס?<pre><code>class Counter {\n    int x;\npublic:\n    Counter(int v):x(v){}\n    Counter&amp; operator++(){ ++x; return *this; }\n    Counter operator++(int){ Counter t=*this; ++x; return t; }\n    int get() const { return x; }\n};\nint main() {\n    Counter c(1);\n    cout &lt;&lt; (c++).get() &lt;&lt; " " &lt;&lt; (++c).get();\n}</code></pre>',
   opts:['1 3','2 3','1 2','2 2'],
   ans:0, exp:'<code>c++</code> (פוסט) מחזיר עותק של הערך <b>הישן</b> (1) אך מגדיל את c ל-2 ← <code>.get()</code>=1. אחר כך <code>++c</code> (קדם) מגדיל ל-3 ומחזיר reference ← <code>.get()</code>=3. תוצאה: <b>1 3</b>.'},
 
- {q:'מה יודפס ביצירת d?<pre><code>struct A { A(){cout<<"A";} };\nstruct B : virtual public A { B(){cout<<"B";} };\nstruct C : virtual public A { C(){cout<<"C";} };\nstruct D : public B, public C { D(){cout<<"D";} };\nint main() { D d; }</code></pre>',
+ {q:'מה יודפס ביצירת d?<pre><code>struct A { A(){cout&lt;&lt;"A";} };\nstruct B : virtual public A { B(){cout&lt;&lt;"B";} };\nstruct C : virtual public A { C(){cout&lt;&lt;"C";} };\nstruct D : public B, public C { D(){cout&lt;&lt;"D";} };\nint main() { D d; }</code></pre>',
   opts:['ABACD','ABCD','BACD','ABDC'],
   ans:1, exp:'בירושה <code>virtual</code>, <code>A</code> נבנה <b>פעם אחת בלבד</b>, ראשון, ע"י המחלקה הכי-נגזרת D. אחר כך B, אחר כך C, ואז D ← <b>ABCD</b>. בלי virtual היה A מופיע פעמיים.'},
 
- {q:'מה יודפס?<pre><code>class Person { public: virtual ~Person(){} };\nclass Employee : public Person {};\nclass Developer : public Employee {};\nint main() {\n    Person* p = new Developer;\n    cout << (typeid(*p)==typeid(Employee));\n    cout << (dynamic_cast<Employee*>(p)!=NULL);\n    delete p;\n}</code></pre>',
+ {q:'מה יודפס?<pre><code>class Person { public: virtual ~Person(){} };\nclass Employee : public Person {};\nclass Developer : public Employee {};\nint main() {\n    Person* p = new Developer;\n    cout &lt;&lt; (typeid(*p)==typeid(Employee));\n    cout &lt;&lt; (dynamic_cast&lt;Employee*&gt;(p)!=NULL);\n    delete p;\n}</code></pre>',
   opts:['00','10','11','01'],
   ans:3, exp:'<code>typeid(*p)</code> הוא הטיפוס המדויק Developer, שאינו שווה ל-Employee ← <b>0</b>. <code>dynamic_cast&lt;Employee*&gt;</code> מצליח כי Developer הוא-כן Employee ← לא NULL ← <b>1</b>. תוצאה: <b>01</b>.'},
 
- {q:'מה נכון?<pre><code>template <class T>\nvoid printIfEqual(const T& a, const T& b){\n    if (a==b) cout << a << endl;\n}\nclass Student {};\nint main() { Student s1,s2; printIfEqual(s1,s2); }</code></pre>',
+ {q:'מה נכון?<pre><code>template &lt;class T&gt;\nvoid printIfEqual(const T&amp; a, const T&amp; b){\n    if (a==b) cout &lt;&lt; a &lt;&lt; endl;\n}\nclass Student {};\nint main() { Student s1,s2; printIfEqual(s1,s2); }</code></pre>',
   opts:['הקוד מתקמפל כל עוד printIfEqual לא נקראת.','הקוד מתקמפל — T יכול להיות כל טיפוס.','שגיאת קומפילציה בעת יצירת המימוש עבור Student — אין תמיכה ב-== וב-<<.','שגיאת ריצה — operator== יוחלט בזמן ריצה.'],
   ans:2, exp:'ה-template משתמש ב-<code>a==b</code> וב-<code>cout<<a</code>. הקריאה עם <code>Student</code> מייצרת מימוש (instantiation), ואז מתגלה ש-Student חסר <code>operator==</code> ו-<code>operator<<</code> ← <b>שגיאת קומפילציה</b>. א שגוי כי כאן <b>כן</b> נקראת; ד שגוי כי הכל בזמן קומפילציה.'},
 
@@ -1326,15 +1326,15 @@ const QUESTIONS=[
   opts:['שגיאת קומפילציה — Circle עדיין אבסטרקטית.','ייווצר Circle, ו-area תחזיר 0.','ייווצר Shape זמני ואז Circle.','הקוד ירוץ אבל תיזרק exception.'],
   ans:0, exp:'<code>Shape</code> אבסטרקטית בגלל <code>area()=0</code>. <code>Circle</code> <b>לא מממשת</b> את area ← נשארת אבסטרקטית ← אי אפשר ליצור ממנה אובייקט ← <code>Circle c;</code> שגיאת קומפילציה.'},
 
- {q:'מה יודפס?<pre><code>class Base { public: virtual void f(){cout<<"B";} };\nclass Derived : public Base { public: void f(){cout<<"D";} };\nvoid foo(Base b){ b.f(); }\nint main() { Derived d; foo(d); }</code></pre>',
+ {q:'מה יודפס?<pre><code>class Base { public: virtual void f(){cout&lt;&lt;"B";} };\nclass Derived : public Base { public: void f(){cout&lt;&lt;"D";} };\nvoid foo(Base b){ b.f(); }\nint main() { Derived d; foo(d); }</code></pre>',
   opts:['D, כי f היא virtual.','B — ההעברה by value יוצרת slicing והאובייקט בתוך foo הוא Base.','שגיאת קומפילציה — אסור להעביר Derived לפונקציה שמקבלת Base.','לא מוגדר — Derived לא הגדירה הורס וירטואלי.'],
   ans:1, exp:'<code>foo(Base b)</code> מקבל <b>by value</b> ← נוצר עותק Base בלבד וה-Derived "נחתך" (slicing). לכן גם ש-f היא virtual, האובייקט הוא Base ← מדפיס "B". אילו החתימה הייתה <code>Base& b</code> — היה מדפיס "D".'},
 
- {q:'מה יודפס?<pre><code>class X {\npublic:\n    X(){ cout<<"C"; throw 7; }\n    ~X(){ cout<<"D"; }\n};\nint main() {\n    try { X x; }\n    catch(int){ cout<<"E"; }\n}</code></pre>',
+ {q:'מה יודפס?<pre><code>class X {\npublic:\n    X(){ cout&lt;&lt;"C"; throw 7; }\n    ~X(){ cout&lt;&lt;"D"; }\n};\nint main() {\n    try { X x; }\n    catch(int){ cout&lt;&lt;"E"; }\n}</code></pre>',
   opts:['CD','CDE','DE','CE'],
   ans:3, exp:'הבנאי מדפיס "C" ואז זורק ← האובייקט <b>לא נבנה במלואו</b> ← ההרסן <b>לא</b> נקרא (אין "D"). ה-catch מדפיס "E". תוצאה: <b>CE</b>.'},
 
- {q:'מה חסר עקרונית במחלקה היורשת?<pre><code>class Buffer {\n    char* data;\npublic:\n    Buffer(const char* s);\n    Buffer(const Buffer& other);\n    Buffer& operator=(const Buffer& other);\n    ~Buffer();\n};\nclass NamedBuffer : public Buffer {\n    char* name;\npublic:\n    NamedBuffer(const char* d, const char* n);\n    ~NamedBuffer(){ delete[] name; }\n};</code></pre>',
+ {q:'מה חסר עקרונית במחלקה היורשת?<pre><code>class Buffer {\n    char* data;\npublic:\n    Buffer(const char* s);\n    Buffer(const Buffer&amp; other);\n    Buffer&amp; operator=(const Buffer&amp; other);\n    ~Buffer();\n};\nclass NamedBuffer : public Buffer {\n    char* name;\npublic:\n    NamedBuffer(const char* d, const char* n);\n    ~NamedBuffer(){ delete[] name; }\n};</code></pre>',
   opts:['אין צורך להוסיף כלום — לבסיס כבר יש Rule of Three.','צריך רק להוסיף virtual לפני הבנאי של NamedBuffer.','צריך לממש גם copy constructor וגם operator= עבור NamedBuffer — name הוא משאב דינמי של היורשת.','צריך למחוק את ה-destructor של NamedBuffer כדי שהקומפיילר ייצור אותו לבד.'],
   ans:2, exp:'ל-<code>NamedBuffer</code> יש משאב דינמי משלה (<code>name</code>) והרסן שמשחרר אותו ← לפי Rule of Three היא חייבת גם <b>בנאי העתקה</b> וגם <b>operator=</b> משלה, אחרת העתקה תשכפל את המצביע <code>name</code> באופן שטחי ← מחיקה כפולה. ה-Rule of Three של הבסיס מטפל רק ב-<code>data</code>.'}
 ];
