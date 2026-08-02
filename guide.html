@@ -603,6 +603,23 @@ p-&gt;<span class="tok-fn">g</span>();   <span class="tok-com">// virtual → ל
 
   <h3>⭐ slicing — "חיתוך" בהעברה by value</h3>
   <p>אם מעבירים אובייקט <code>Derived</code> לפונקציה שמקבלת <code>Base</code> <b>by value</b>, נוצר עותק מסוג Base בלבד — החלק של Derived "נחתך". לכן גם מתודה <code>virtual</code> תריץ את גרסת ה-Base.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Animal</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-key">virtual</span> <span class="tok-key">void</span> <span class="tok-fn">speak</span>(){ cout&lt;&lt;<span class="tok-str">"sound"</span>; }
+};
+<span class="tok-key">class</span> <span class="tok-type">Dog</span> : <span class="tok-key">public</span> <span class="tok-type">Animal</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-key">void</span> <span class="tok-fn">speak</span>(){ cout&lt;&lt;<span class="tok-str">"Woof"</span>; }
+};
+
+<span class="tok-key">void</span> <span class="tok-fn">byValue</span>(<span class="tok-type">Animal</span> a){ a.<span class="tok-fn">speak</span>(); }   <span class="tok-com">// by value</span>
+<span class="tok-key">void</span> <span class="tok-fn">byRef</span>(<span class="tok-type">Animal</span>&amp; a){ a.<span class="tok-fn">speak</span>(); }   <span class="tok-com">// by reference</span>
+
+<span class="tok-type">Dog</span> d;
+<span class="tok-fn">byValue</span>(d);   <span class="tok-com">// "sound" ← slicing! החלק של Dog נחתך</span>
+<span class="tok-fn">byRef</span>(d);     <span class="tok-com">// "Woof"  ← עובד, זו הפניה לאובייקט האמיתי</span></code></pre>
+  <p><b>למה <code>byValue</code> מדפיס "sound"?</b> הפרמטר <code>Animal a</code> הוא עותק בגודל Animal. כשמעבירים את הכלב, רק החלק של Animal נכנס לעותק — החלק הייחודי של Dog לא נכנס ל"קופסה" בגודל Animal ונחתך. העותק הוא Animal טהור, כבר לא כלב, ולכן <code>speak()</code> מריץ את גרסת Animal — גם ש-<code>speak</code> היא <code>virtual</code>.</p>
+  <p><b>למה <code>byRef</code> מדפיס "Woof"?</b> הפניה לאובייקט האמיתי, בלי עותק — הכלב נשאר כלב. <code>virtual</code> בוחר לפי האובייקט האמיתי, אז רצה גרסת Dog. הכלל: <code>virtual</code> עוזר רק דרך <b>מצביע או reference</b>; העתקה לתוך טיפוס הבסיס תמיד חותכת.</p>
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 18)</span>
   פולימורפיזם עובד רק דרך <b>מצביע או reference</b>. <code>void foo(Base b)</code> מקבל <b>עותק by value</b> ← slicing ← מדפיס "B" גם אם f היא virtual. אם היה כתוב <code>Base&amp; b</code> — היה מדפיס "D".</p></div>
 
