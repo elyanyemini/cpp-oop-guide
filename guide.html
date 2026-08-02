@@ -911,8 +911,30 @@ cout &lt;&lt; (<span class="tok-key">dynamic_cast</span>&lt;<span class="tok-typ
   <h2 class="title">מודול 7 · ירושה מרובה ויהלום המוות</h2>
   <p class="lead">כשמחלקה יורשת מכמה מחלקות — סדר בנייה, דו-משמעות, ו-virtual inheritance.</p>
 
+  <h3>הרשאות בשרשרת ירושה (7.1)</h3>
+  <p>במודול 5 ראינו איך סוג הירושה מתרגם הרשאות ברמה אחת. כאן מרחיבים לשרשרת: A→B→C. הכלל המרכזי:</p>
+  <div class="box key"><span class="label">ההרשאה הסופית תמיד המגבילה ביותר</span>
+  לאורך שרשרת ירושה, הנגישות של שדה יכולה רק <b>להצטמצם</b>, לא להתרחב. אם באמצע השרשרת הייתה ירושת <code>private</code> או <code>protected</code>, ההגבלה נשמרת גם הלאה.</p></div>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">A</span> { <span class="tok-key">public</span>: <span class="tok-key">int</span> x; };
+<span class="tok-key">class</span> <span class="tok-type">B</span> : <span class="tok-key">private</span> <span class="tok-type">A</span> {};    <span class="tok-com">// x הופך ל-private ב-B</span>
+<span class="tok-key">class</span> <span class="tok-type">C</span> : <span class="tok-key">public</span> <span class="tok-type">B</span> {
+    <span class="tok-key">void</span> <span class="tok-fn">f</span>(){ <span class="tok-com">/* x כבר לא נגיש כאן — ננעל ב-B */</span> }
+};</code></pre>
+  <p>מכיוון ש-B ירשה את A כ-<code>private</code>, השדה <code>x</code> ננעל ב-B — ולכן C (שיורשת מ-B) כבר לא יכולה לגשת אליו כלל, למרות שבמקור x היה public.</p>
+
+  <h3>שחזור הרשאה עם using-declaration</h3>
+  <p>אחרי שהרשאה צומצמה בירושת <code>private</code>, אפשר "לשחזר" הרשאה לשדה ספציפי באמצעות הכרזת <code>using</code> (במצגת מופיע גם התחביר הישן <code>A::x;</code>):</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">B</span> : <span class="tok-key">private</span> <span class="tok-type">A</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-key">using</span> <span class="tok-type">A</span>::x;   <span class="tok-com">// מחזיר דווקא את x חזרה ל-public ב-B</span>
+};</code></pre>
+  <p>כך שולטים בעדינות: מצמצמים הכל ב-private, ואז חושפים בחזרה רק את מה שרוצים. שימי לב — אפשר רק לשחזר לרמה שהייתה במקור או נמוכה ממנה, לא "לשדרג" מעבר לה.</p>
+
   <h3>ירושה מרובה</h3>
   <p>מחלקה יכולה לרשת מכמה מחלקות בבת אחת: <code>class C : public A, public B</code>.</p>
+  <div class="box tip"><span class="label">שים לב — ברירת מחדל private לכל מציין</span>
+  ב-<code>class C : public A, B</code> — ה-<code>public</code> חל <b>רק על A</b>. ל-B אין מציין, וב-<code>class</code> ברירת המחדל היא <code>private</code>, אז B נורשת כ-<code>private</code>. צריך <code>class C : public A, public B</code> כדי ששתיהן יהיו public.</p></div>
+  <p><b>פריסה בזיכרון:</b> באובייקט של C, החלקים של הבסיסים מונחים לפי סדר ההכרזה (קודם A, אז B), ואז השדות של C. בירושה וירטואלית נוסף מצביע לעותק המשותף של האב — וזו התקורה של <code>virtual</code> inheritance.</p>
 
   <h3>⭐ סדר בנייה בירושה מרובה</h3>
   <div class="box key"><span class="label">הכלל</span>הבסיסים נבנים <b>לפי סדר ההכרזה</b> ברשימת הירושה (לא לפי סדר ה-init list), ואז המחלקה עצמה. ההריסה — הפוך.</p></div>
