@@ -741,6 +741,41 @@ cout &lt;&lt; (<span class="tok-key">dynamic_cast</span>&lt;<span class="tok-typ
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 14)</span>
   עם <code>virtual</code> inheritance, A נבנה <b>פעם אחת</b> ראשון (לא פעמיים). הסדר: A, ואז B, ואז C, ואז D ← <b>ABCD</b>. בלי virtual היה יוצא ABAC... (A פעמיים).</p></div>
 
+  <h3>⭐ בנאי בירושה וירטואלית — מי קורא לבנאי של האב?</h3>
+  <p>נקודה עדינה שנובעת מכך ש-A נבנה <b>פעם אחת בלבד</b>: בירושה רגילה, כל מחלקה קוראת לבנאי של האב שלה. אבל בירושה וירטואלית, אם A מקבל פרמטרים בבנאי, ו-B1 קורא <code>A(1)</code> ו-B2 קורא <code>A(2)</code> — למי להאמין? זו אי-ודאות.</p>
+  <p><b>הכלל:</b> בירושה וירטואלית, האחריות לקרוא לבנאי של האב המשותף עוברת ל<b>מחלקה הכי-נגזרת</b> (C). הקריאות של B1 ו-B2 ל-A <b>מתעלמים מהן</b>, ו-C חייבת לקרוא ל-A ישירות ב-init list שלה.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">A</span> {
+    <span class="tok-key">int</span> x;
+<span class="tok-key">public</span>:
+    <span class="tok-fn">A</span>(<span class="tok-key">int</span> ax) : x(ax) {}          <span class="tok-com">// לבנאי יש פרמטר</span>
+};
+<span class="tok-key">class</span> <span class="tok-type">B1</span> : <span class="tok-key">virtual</span> <span class="tok-key">public</span> <span class="tok-type">A</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-fn">B1</span>() : <span class="tok-fn">A</span>(<span class="tok-num">1</span>) {}              <span class="tok-com">// מתעלמים מזה בירושה וירטואלית</span>
+};
+<span class="tok-key">class</span> <span class="tok-type">B2</span> : <span class="tok-key">virtual</span> <span class="tok-key">public</span> <span class="tok-type">A</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-fn">B2</span>() : <span class="tok-fn">A</span>(<span class="tok-num">2</span>) {}              <span class="tok-com">// גם מזה</span>
+};
+
+<span class="tok-key">class</span> <span class="tok-type">C</span> : <span class="tok-key">public</span> <span class="tok-type">B1</span>, <span class="tok-key">public</span> <span class="tok-type">B2</span> {};      <span class="tok-com">// ❌ שגיאה — A חסר בנאי ברירת מחדל ו-C לא קוראת לו</span>
+
+<span class="tok-key">class</span> <span class="tok-type">C</span> : <span class="tok-key">public</span> <span class="tok-type">B1</span>, <span class="tok-key">public</span> <span class="tok-type">B2</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-fn">C</span>() : <span class="tok-fn">A</span>(<span class="tok-num">0</span>) {}               <span class="tok-com">// ✅ הפתרון — C קוראת ל-A ישירות</span>
+};</code></pre>
+  <div class="box trap"><span class="label">מלכודת מבחן</span>
+  בירושה וירטואלית, המחלקה הכי-נגזרת <b>חייבת</b> לקרוא בעצמה לבנאי של האב המשותף. אם ל-A אין בנאי ברירת מחדל ו-C לא קוראת ל-<code>A(...)</code> ← שגיאת קומפילציה, למרות ש-B1 ו-B2 "כאילו" קוראות לו.</p></div>
+
+  <h3>מתי כפילות של האב היא דווקא רצויה?</h3>
+  <p>המדריך הציג את היהלום כבעיה — אבל לא תמיד. לפעמים שני עותקים של האב הם בדיוק מה שרוצים, ואז <b>לא</b> משתמשים ב-<code>virtual</code> inheritance:</p>
+  <table class="tbl">
+    <tr><th>מקרה</th><th>עותק כפול של האב</th><th>מה עושים</th></tr>
+    <tr><td>שעון Rolex שיורש מ-AnalogClock ו-DigitalClock (שניהם יורשים מ-Time)</td><td><b>רצוי</b> — כל תצוגה שומרת זמן משלה</td><td>ירושה רגילה (שני עותקי Time)</td></tr>
+    <tr><td>ElectricBaseGuitar שיורש מ-ElectricGuitar ו-BaseGuitar (שניהם יורשים מ-Guitar)</td><td><b>באג</b> — גיטרה אחת, לא שתיים</td><td>ירושה <code>virtual</code> (עותק אחד)</td></tr>
+  </table>
+  <p>המסקנה: <code>virtual</code> inheritance היא לא "תמיד נכונה". משתמשים בה רק כשעותק <b>אחד</b> של האב המשותף הוא ההגיוני. כשכל תת-אובייקט אמור להיות עצמאי — משאירים ירושה רגילה.</p>
+
   <p class="maps">מכסה שאלות: 11, 12, 14</p>
 </section>
 
