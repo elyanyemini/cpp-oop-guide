@@ -691,6 +691,59 @@ cout &lt;&lt; <span class="tok-type">Widget</span>::<span class="tok-fn">getCoun
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 9)</span>
   ב-<code>class B : protected A</code>, שדה שהיה <code>public</code> ב-A הופך ל-<code>protected</code> ביחס ל-B. לכן <b>בתוך</b> מתודה של B מותר לגשת אליו, אבל <b>מבחוץ</b> (<code>b.x</code> ב-main) — שגיאת קומפילציה.</p></div>
 
+  <h3>⭐ סדר בנייה בירושה + העברת פרמטרים לבנאי הבסיס</h3>
+  <p>כשנבנה אובייקט יורש, קודם רץ הבנאי של <b>הבסיס</b>, אחר כך בנאי השדות (member objects) לפי סדר הכרזתם, ולבסוף גוף הבנאי של היורשת. אם לבנאי הבסיס יש פרמטרים, היורשת מעבירה אותם דרך <b>init list</b>:</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">A</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-fn">A</span>(<span class="tok-key">int</span> x) { cout&lt;&lt;<span class="tok-str">"A"</span>; }
+};
+<span class="tok-key">class</span> <span class="tok-type">B</span> : <span class="tok-key">public</span> <span class="tok-type">A</span> {
+    <span class="tok-type">A</span> member;
+<span class="tok-key">public</span>:
+    <span class="tok-fn">B</span>(<span class="tok-key">int</span> x) : <span class="tok-fn">A</span>(x), member(x) { cout&lt;&lt;<span class="tok-str">"B"</span>; }  <span class="tok-com">// A(x) = קריאה לבנאי הבסיס</span>
+};
+<span class="tok-type">B</span> b(<span class="tok-num">5</span>);   <span class="tok-com">// בסיס A, אז השדה member (מסוג A), אז גוף B → "AAB"</span></code></pre>
+  <div class="box trap"><span class="label">מלכודת מבחן</span>
+  אם לבסיס אין בנאי ברירת מחדל והיורשת <b>לא</b> קוראת לבנאי הבסיס ב-init list ← שגיאת קומפילציה. חייבים <code>B(int x) : A(x)</code>.</p></div>
+
+  <h3>⭐ קריאה מפורשת למתודת בסיס + name hiding</h3>
+  <p>כשיורשת מגדירה מתודה בשם שכבר קיים בבסיס, השם של הבסיס <b>מוסתר</b> (name hiding). כדי להגיע אליו במפורש משתמשים ב-<code>Base::</code>. זה שימושי כשרוצים <b>להרחיב</b> התנהגות, לא להחליף:</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Stack</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-key">void</span> <span class="tok-fn">Push</span>(<span class="tok-key">int</span> x) { <span class="tok-com">/* הכנסה רגילה */</span> }
+};
+<span class="tok-key">class</span> <span class="tok-type">CountingStack</span> : <span class="tok-key">public</span> <span class="tok-type">Stack</span> {
+    <span class="tok-key">int</span> count;
+<span class="tok-key">public</span>:
+    <span class="tok-key">void</span> <span class="tok-fn">Push</span>(<span class="tok-key">int</span> x) {
+        <span class="tok-type">Stack</span>::<span class="tok-fn">Push</span>(x);   <span class="tok-com">// קורא לגרסת הבסיס...</span>
+        count++;           <span class="tok-com">// ...ואז מוסיף</span>
+    }
+};</code></pre>
+  <div class="box tip"><span class="label">שלושה מושגים דומים — אל תתבלבלי</span>
+  <b>Overriding</b> = יורשת מגדירה מחדש מתודה <code>virtual</code> (מודול 6). <b>Overloading</b> = כמה פונקציות באותו שם עם פרמטרים שונים. <b>Name hiding</b> = שם ביורשת מסתיר את של הבסיס (גם בלי virtual); גישה עם <code>Base::name</code>.</p></div>
+
+  <h3>⭐ operator= בירושה</h3>
+  <p>אם יורשת מוסיפה משאב דינמי משלה, ה-<code>operator=</code> שלה חייב <b>קודם</b> לקרוא ל-<code>operator=</code> של הבסיס (כדי להעתיק את חלק הבסיס), ואז לטפל בשדות שלה:</p>
+  <pre><code><span class="tok-type">CountingStack</span>&amp; <span class="tok-fn">operator=</span>(<span class="tok-key">const</span> <span class="tok-type">CountingStack</span>&amp; s){
+    <span class="tok-key">if</span> (<span class="tok-key">this</span> != &amp;s){
+        <span class="tok-type">Stack</span>::<span class="tok-fn">operator=</span>(s);   <span class="tok-com">// מעתיק את חלק הבסיס במפורש!</span>
+        count = s.count;         <span class="tok-com">// ואז שדות היורשת</span>
+    }
+    <span class="tok-key">return</span> *<span class="tok-key">this</span>;
+}</code></pre>
+  <div class="box trap"><span class="label">מלכודת מבחן</span>
+  אם היורשת לא קוראת ל-<code>Base::operator=</code>, חלק הבסיס <b>לא יועתק</b> (או יועתק שטחית) ← באג. זה קשור ישירות ל-Rule of Three בירושה (מודול 9, שאלה 20).</p></div>
+
+  <h3>ירושה מול הרכבה — "הוא-סוג-של" מול "יש-לו"</h3>
+  <p>שיקול תכנון בסיסי: מתי לרשת ומתי להכיל (composition, מודול 1)?</p>
+  <table class="tbl">
+    <tr><th>יחס</th><th>מתי</th><th>דוגמה</th></tr>
+    <tr><td><b>ירושה</b> (is-a)</td><td>היורשת <b>היא סוג של</b> הבסיס</td><td>Dog הוא-סוג-של Animal</td></tr>
+    <tr><td><b>הרכבה</b> (has-a)</td><td>למחלקה <b>יש</b> את השני כחלק</td><td>ל-Car <b>יש</b> Engine</td></tr>
+  </table>
+  <p>כלל אצבע: אם היית אומרת "X הוא Y" — ירושה. אם "X מכיל Y" — הרכבה. שימוש שגוי בירושה (למשל Car יורש מ-Engine) מוביל לתכנון מבולבל.</p>
+
   <p class="maps">מכסה שאלה: 9</p>
 </section>
 
@@ -727,6 +780,32 @@ p-&gt;<span class="tok-fn">f</span>();   <span class="tok-com">// לא virtual �
 p-&gt;<span class="tok-fn">g</span>();   <span class="tok-com">// virtual → לפי האובייקט האמיתי Derived → "Dg"</span>
 <span class="tok-com">// סה"כ: BfDg</span></code></pre>
   <p class="maps" style="margin-bottom:20px">כאן מוסתרת שאלה 6.</p>
+
+  <h3>התפשטות virtual ליורשות</h3>
+  <p>ברגע שמתודה מוכרזת <code>virtual</code> במחלקת הבסיס, היא נשארת <code>virtual</code> בכל היורשות — <b>גם בלי לכתוב שוב את המילה</b>. לכן אם Base הכריזה <code>virtual void g()</code>, אז ה-<code>g</code> של Derived (וגם של יורשת של Derived) וירטואלי אוטומטית. נהוג בכל זאת לכתוב <code>virtual</code> שוב לשם בהירות, אבל זה לא חובה.</p>
+
+  <h3>⭐ המלכודת: מתודה וירטואלית שקוראת ללא-וירטואלית</h3>
+  <p>נדבך מעל BfDg. כשמתודה <code>virtual</code> של הבסיס קוראת בתוכה למתודות אחרות, כל קריאה נפתרת <b>לפי הכלל שלה</b>: קריאה למתודה וירטואלית → לפי האובייקט האמיתי; קריאה למתודה לא-וירטואלית → לפי המחלקה שבה הקוד כתוב.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">A</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-key">virtual</span> <span class="tok-key">void</span> <span class="tok-fn">f</span>(){ cout&lt;&lt;<span class="tok-str">"Af "</span>; }
+    <span class="tok-key">void</span> <span class="tok-fn">h</span>(){ cout&lt;&lt;<span class="tok-str">"Ah "</span>; }
+    <span class="tok-key">virtual</span> <span class="tok-key">void</span> <span class="tok-fn">g</span>(){ <span class="tok-fn">f</span>(); <span class="tok-fn">h</span>(); }   <span class="tok-com">// קורא ל-f (virtual) ול-h (לא)</span>
+};
+<span class="tok-key">class</span> <span class="tok-type">C</span> : <span class="tok-key">public</span> <span class="tok-type">A</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-key">void</span> <span class="tok-fn">f</span>(){ cout&lt;&lt;<span class="tok-str">"Cf "</span>; }
+    <span class="tok-key">void</span> <span class="tok-fn">h</span>(){ cout&lt;&lt;<span class="tok-str">"Ch "</span>; }
+};
+<span class="tok-type">A</span>* p = <span class="tok-key">new</span> <span class="tok-type">C</span>;
+p-&gt;<span class="tok-fn">g</span>();   <span class="tok-com">// g של A רץ. בתוכו: f וירטואלי → Cf ; h לא-וירטואלי → Ah</span>
+<span class="tok-com">// מדפיס: Cf Ah</span></code></pre>
+  <div class="box trap"><span class="label">מלכודת מבחן</span>
+  בתוך <code>g</code> (של A): <code>f()</code> וירטואלי ← נבחר לפי האובייקט האמיתי C ← <b>Cf</b>. <code>h()</code> לא-וירטואלי ← נבחר לפי המחלקה שבה g כתוב (A) ← <b>Ah</b>. התוצאה מערבבת C ו-A — כאן רוב הטועים.</p></div>
+
+  <h3>איך virtual עובד מאחורי הקלעים — vtable ו-vptr</h3>
+  <p>איך C++ יודעת בזמן ריצה איזו גרסה להריץ? לכל מחלקה עם מתודות virtual נבנית <b>טבלה</b> (<code>vtable</code>) של מצביעים למתודות הווירטואליות שלה. כל אובייקט מכזו מחלקה מחזיק מצביע מוסתר (<code>vptr</code>) לטבלה של המחלקה האמיתית שלו.</p>
+  <p>כשקוראים <code>p-&gt;g()</code> על מתודה וירטואלית, במקום "לקפוץ" לכתובת קבועה, התוכנית הולכת דרך ה-<code>vptr</code> של האובייקט אל ה-vtable ומשם למתודה הנכונה — ולכן זה נפתר לפי האובייקט האמיתי. זו הסיבה ש-<code>virtual</code> עולה קצת: מצביע נוסף בכל אובייקט, וקפיצה עקיפה בכל קריאה. זה גם מסביר <b>למה</b> הרסן וירטואלי הכרחי כדי שהמחיקה תגיע לגרסה הנכונה.</p>
 
   <h3>⭐ slicing — "חיתוך" בהעברה by value</h3>
   <p>אם מעבירים אובייקט <code>Derived</code> לפונקציה שמקבלת <code>Base</code> <b>by value</b>, נוצר עותק מסוג Base בלבד — החלק של Derived "נחתך". לכן גם מתודה <code>virtual</code> תריץ את גרסת ה-Base.</p>
