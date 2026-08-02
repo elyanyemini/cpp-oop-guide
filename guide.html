@@ -1024,6 +1024,55 @@ cout &lt;&lt; (<span class="tok-key">dynamic_cast</span>&lt;<span class="tok-typ
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 16)</span>
   <code>printIfEqual</code> משתמש ב-<code>a == b</code> וב-<code>cout &lt;&lt; a</code>. אם קוראים לו עם <code>Student</code> שאין לו <code>operator==</code> ו-<code>operator&lt;&lt;</code> ← <b>שגיאת קומפילציה בעת יצירת המימוש עבור Student</b>. זו לא שגיאת ריצה, ולא "T יכול להיות כל טיפוס".</p></div>
 
+  <h3>⭐ מחלקות תבנית (Class Templates)</h3>
+  <p>לא רק פונקציות — גם <b>מחלקות</b> שלמות יכולות להיות גנריות. במקום לכתוב <code>IntVector</code>, <code>DoubleVector</code> וכו', כותבים מחלקה אחת עם טיפוס כללי <code>T</code>:</p>
+  <pre><code><span class="tok-key">template</span> &lt;<span class="tok-key">class</span> <span class="tok-type">T</span>&gt;
+<span class="tok-key">class</span> <span class="tok-type">Vector</span> {
+    <span class="tok-type">T</span>* items;
+    <span class="tok-key">int</span> size;
+<span class="tok-key">public</span>:
+    <span class="tok-fn">Vector</span>(<span class="tok-key">int</span> n) : size(n) { items = <span class="tok-key">new</span> <span class="tok-type">T</span>[size]; }
+    <span class="tok-type">T</span>&amp; <span class="tok-fn">operator[]</span>(<span class="tok-key">int</span> i) { <span class="tok-key">return</span> items[i]; }
+    <span class="tok-key">void</span> <span class="tok-fn">Print</span>();
+};
+
+<span class="tok-type">Vector</span>&lt;<span class="tok-key">int</span>&gt; vi(<span class="tok-num">3</span>);        <span class="tok-com">// T = int</span>
+<span class="tok-type">Vector</span>&lt;<span class="tok-type">Employee</span>*&gt; ve(<span class="tok-num">5</span>);  <span class="tok-com">// T = Employee* — מכל (container) כללי</span></code></pre>
+  <div class="box key"><span class="label">מימוש מתודה של מחלקת תבנית מחוץ למחלקה</span>
+  צריך לחזור על שורת ה-<code>template</code> ולציין <code>&lt;T&gt;</code> אחרי שם המחלקה:</p>
+  <pre><code><span class="tok-key">template</span> &lt;<span class="tok-key">class</span> <span class="tok-type">T</span>&gt;
+<span class="tok-key">void</span> <span class="tok-type">Vector</span>&lt;<span class="tok-type">T</span>&gt;::<span class="tok-fn">Print</span>() {
+    <span class="tok-key">for</span> (<span class="tok-key">int</span> i=<span class="tok-num">0</span>; i&lt;size; i++) cout &lt;&lt; items[i];
+}</code></pre></div>
+  <div class="box tip"><span class="label">הבדל חשוב מפונקציית תבנית</span>
+  בפונקציית תבנית המהדר <b>מסיק</b> את T מהארגומנטים. במחלקת תבנית חייבים <b>לציין</b> את הטיפוס במפורש בתוך <code>&lt;&gt;</code>: <code>Vector&lt;int&gt; v;</code> — אין הסקה.</p></div>
+
+  <h3>Template Specialization — גרסה מיוחדת לטיפוס מסוים</h3>
+  <p>לפעמים הגרסה הכללית לא מתאימה לטיפוס ספציפי. למשל <code>max</code> כללי משתמש ב-<code>&lt;</code>, אבל עבור <code>const char*</code> (מחרוזת) <code>&lt;</code> משווה כתובות, לא תוכן! הפתרון: לכתוב <b>גרסה מיוחדת</b> (specialization) שגוברת על הכללית עבור הטיפוס הזה:</p>
+  <pre><code><span class="tok-key">template</span> &lt;<span class="tok-key">class</span> <span class="tok-type">T</span>&gt;               <span class="tok-com">// גרסה כללית</span>
+<span class="tok-type">T</span> <span class="tok-fn">maxT</span>(<span class="tok-type">T</span> a, <span class="tok-type">T</span> b){ <span class="tok-key">return</span> (a &lt; b) ? b : a; }
+
+<span class="tok-key">template</span> &lt;&gt;                        <span class="tok-com">// גרסה מיוחדת ל-const char*</span>
+<span class="tok-key">const</span> <span class="tok-key">char</span>* <span class="tok-fn">maxT</span>(<span class="tok-key">const</span> <span class="tok-key">char</span>* a, <span class="tok-key">const</span> <span class="tok-key">char</span>* b){
+    <span class="tok-key">return</span> (<span class="tok-fn">strcmp</span>(a,b) &lt; <span class="tok-num">0</span>) ? b : a;   <span class="tok-com">// משווה תוכן, לא כתובות</span>
+}</code></pre>
+
+  <h3>Templates מול Polymorphism</h3>
+  <p>שתי דרכים לכתוב קוד גנרי, עם trade-off:</p>
+  <table class="tbl">
+    <tr><th></th><th>Templates</th><th>Polymorphism (virtual)</th></tr>
+    <tr><td>מתי נקבע</td><td>קומפילציה (הטיפוסים ידועים)</td><td>ריצה (האובייקט האמיתי)</td></tr>
+    <tr><td>עובד על</td><td>כל טיפוס שתומך בפעולות הנדרשות</td><td>טיפוסים באותה היררכיית ירושה</td></tr>
+    <tr><td>מחיר</td><td>גודל קוד (גרסה לכל טיפוס)</td><td>קפיצה עקיפה בזמן ריצה (vtable)</td></tr>
+  </table>
+
+  <h3>ירושה ממחלקת תבנית</h3>
+  <p>אפשר לרשת ממחלקת תבנית בשתי צורות: עם טיפוס קונקרטי, או תוך שמירה על הגנריות:</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">B</span> : <span class="tok-key">public</span> <span class="tok-type">A</span>&lt;<span class="tok-key">int</span>&gt; { };            <span class="tok-com">// יורשת עם T=int קבוע</span>
+
+<span class="tok-key">template</span> &lt;<span class="tok-key">class</span> <span class="tok-type">T</span>&gt;
+<span class="tok-key">class</span> <span class="tok-type">B</span> : <span class="tok-key">public</span> <span class="tok-type">A</span>&lt;<span class="tok-type">T</span>&gt; { };  <span class="tok-com">// נשארת גנרית ומעבירה את T הלאה</span></code></pre>
+
   <p class="maps">מכסה שאלות: 7, 16</p>
 </section>
 
