@@ -215,6 +215,13 @@ b.<span class="tok-fn">set</span>(<span class="tok-num">9</span>,<span class="to
   </table>
   <p>בדיוק כמו במתמטיקה: חיבור צריך שני מספרים (בינארי), מינוס-סימן צריך רק אחד (אונרי). ההבחנה חשובה כי אופרטורים אונריים ובינאריים נכתבים אחרת (מודול 3).</p>
 
+  <h3>11. <code>bool</code> והדפסתו כ-0/1</h3>
+  <p><code>bool</code> הוא טיפוס שיכול להכיל רק שני ערכים: <code>true</code> (אמת) או <code>false</code> (שקר). אופרטורי השוואה כמו <code>==</code> ו-<code>!=</code> מחזירים <code>bool</code>.</p>
+  <p>נקודה שמבלבלת: כשמדפיסים <code>bool</code> עם <code>cout</code>, הוא מומר אוטומטית ל-<code>int</code> — <code>false</code> הופך ל-<code>0</code> ו-<code>true</code> הופך ל-<code>1</code>. לכן הדפסה של תוצאת השוואה מציגה ספרה, לא את המילה "true"/"false":</p>
+  <pre><code>cout &lt;&lt; (<span class="tok-num">5</span> == <span class="tok-num">5</span>);   <span class="tok-com">// true → מודפס 1</span>
+cout &lt;&lt; (<span class="tok-num">5</span> == <span class="tok-num">3</span>);   <span class="tok-com">// false → מודפס 0</span></code></pre>
+  <p>זה חשוב בשאלות "מה יודפס" שמכניסות השוואה ישירות ל-<code>cout</code> (למשל שאלה 15) — התוצאה תהיה רצף של 0 ו-1.</p>
+
   <div class="box key"><span class="label">סיכום המושגים</span>
   <b>מצביע</b> = משתנה שמחזיק כתובת. <b>reference</b> = שם נוסף למשתנה. <b>new/delete</b> = הקצאה/שחרור זיכרון ידני. <b>const</b> = לא ניתן לשינוי. <b>מתודה</b> = פונקציה של מחלקה (נקראת עם נקודה); <b>פונקציה חופשית</b> = עומדת לבד. <b>this</b> = מצביע לאובייקט הנוכחי. <b>friend</b> = רשות גישה ל-private. <b>אונרי</b> = אופרנד אחד; <b>בינארי</b> = שניים.</p></div>
 
@@ -667,12 +674,35 @@ p-&gt;<span class="tok-fn">g</span>();   <span class="tok-com">// virtual → ל
   אם <code>Circle</code> יורשת מ-<code>Shape</code> האבסטרקטית אבל <b>לא מממשת</b> את <code>area()</code>, אז Circle עדיין אבסטרקטית ← <code>Circle c;</code> הוא <b>שגיאת קומפילציה</b>.</p></div>
 
   <h3>typeid ו-dynamic_cast (RTTI)</h3>
-  <p><code>typeid(*p)</code> מחזיר את הטיפוס <b>המדויק</b> של האובייקט. <code>dynamic_cast&lt;T*&gt;(p)</code> מנסה להמיר; מחזיר את המצביע אם ההמרה חוקית (T הוא הטיפוס או אב שלו), או <code>NULL</code> אם לא.</p>
+  <p>אלה שני כלים לבדוק, בזמן ריצה, מה הטיפוס האמיתי שמאחורי מצביע בסיס.</p>
+  <p><b><code>dynamic_cast</code></b> הוא <b>המרה בטוחה בזמן ריצה</b> של מצביע בתוך היררכיית ירושה. השימוש הנפוץ: יש לך מצביע בסיס (<code>Animal*</code>) ואת רוצה להתייחס אליו כאל הטיפוס הנגזר (<code>Dog*</code>) — למשל כדי לקרוא למתודה שקיימת רק ב-Dog. הוא בודק בזמן ריצה אם האובייקט האמיתי הוא מהטיפוס המבוקש: אם כן — מחזיר מצביע תקין; אם לא — מחזיר <code>NULL</code>, כדי שלא תקרסי. הסוגריים המשולשים <code>&lt;&gt;</code> מציינים את <b>טיפוס היעד</b>: <code>dynamic_cast&lt;Dog*&gt;(a)</code> = "נסה להמיר את a ל-Dog*".</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Animal</span> { <span class="tok-key">public</span>: <span class="tok-key">virtual</span> ~<span class="tok-fn">Animal</span>(){} };
+<span class="tok-key">class</span> <span class="tok-type">Dog</span> : <span class="tok-key">public</span> <span class="tok-type">Animal</span> { <span class="tok-key">public</span>: <span class="tok-key">void</span> <span class="tok-fn">bark</span>(){ cout&lt;&lt;<span class="tok-str">"Woof"</span>; } };
+<span class="tok-key">class</span> <span class="tok-type">Cat</span> : <span class="tok-key">public</span> <span class="tok-type">Animal</span> {};
+
+<span class="tok-type">Animal</span>* a = <span class="tok-key">new</span> <span class="tok-type">Dog</span>;                <span class="tok-com">// מצביע בסיס שמצביע על כלב</span>
+
+<span class="tok-type">Dog</span>* d = <span class="tok-key">dynamic_cast</span>&lt;<span class="tok-type">Dog</span>*&gt;(a);   <span class="tok-com">// האובייקט באמת כלב → מצביע תקין</span>
+<span class="tok-key">if</span> (d != <span class="tok-num">NULL</span>) d-&gt;<span class="tok-fn">bark</span>();          <span class="tok-com">// "Woof"</span>
+
+<span class="tok-type">Cat</span>* c = <span class="tok-key">dynamic_cast</span>&lt;<span class="tok-type">Cat</span>*&gt;(a);   <span class="tok-com">// האובייקט אינו חתול → NULL</span>
+<span class="tok-key">if</span> (c == <span class="tok-num">NULL</span>) cout&lt;&lt;<span class="tok-str">"not a cat"</span>;</code></pre>
+  <p>אותו תחביר בדיוק בשתי ההמרות — אבל התוצאה תלויה באובייקט האמיתי. ההמרה ל-<code>Dog*</code> מצליחה כי a הוא כלב; ההמרה ל-<code>Cat*</code> מחזירה <code>NULL</code> כי a אינו חתול (Dog ו-Cat הם "אחים" נפרדים). ה-<code>NULL</code> הוא לא באג — זו התכונה של <code>dynamic_cast</code>: הוא מודיע לך שההמרה לא חוקית, במקום לקרוס.</p>
+  <p><b><code>typeid(*p)</code></b> מחזיר את הטיפוס <b>המדויק</b> של האובייקט. ההבדל המהותי מ-<code>dynamic_cast</code>: <code>typeid</code> דורש התאמה <b>מדויקת</b>, בעוד <code>dynamic_cast</code> מסתפק ב"הוא סוג של".</p>
+  <div class="box key"><span class="label">RTTI עובד רק על מחלקות פולימורפיות</span>
+  ‎<code>dynamic_cast</code> ו-<code>typeid</code> עובדים <b>רק</b> על מחלקות פולימורפיות — כאלה עם לפחות מתודה <code>virtual</code> אחת. לכן ל-<code>Animal</code> יש הרסן <code>virtual</code>: הוא הופך אותה לפולימורפית וכך מאפשר בכלל את ה-RTTI. (וזו גם הסיבה הכללית — הרסן וירטואלי מבטיח מחיקה בטוחה דרך מצביע בסיס.) בלי אף מתודה וירטואלית, המהדר לא יאפשר <code>dynamic_cast</code> על האובייקט.</p></div>
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 15)</span>
-  אובייקט אמיתי <code>Developer</code> (שיורש מ-Employee שיורש מ-Person):<br>
-  • <code>typeid(*p) == typeid(Employee)</code> → <b>0</b> (הטיפוס המדויק הוא Developer, לא Employee).<br>
-  • <code>dynamic_cast&lt;Employee*&gt;(p) != NULL</code> → <b>1</b> (Developer הוא-כן Employee).<br>
-  תוצאה: <b>01</b>.</p></div>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Person</span>   { <span class="tok-key">public</span>: <span class="tok-key">virtual</span> ~<span class="tok-fn">Person</span>(){} };
+<span class="tok-key">class</span> <span class="tok-type">Employee</span>  : <span class="tok-key">public</span> <span class="tok-type">Person</span>   {};
+<span class="tok-key">class</span> <span class="tok-type">Developer</span> : <span class="tok-key">public</span> <span class="tok-type">Employee</span> {};
+
+<span class="tok-type">Person</span>* p = <span class="tok-key">new</span> <span class="tok-type">Developer</span>;   <span class="tok-com">// p: מצביע Person על אובייקט Developer</span>
+cout &lt;&lt; (<span class="tok-key">typeid</span>(*p) == <span class="tok-key">typeid</span>(<span class="tok-type">Employee</span>));      <span class="tok-com">// שורה א</span>
+cout &lt;&lt; (<span class="tok-key">dynamic_cast</span>&lt;<span class="tok-type">Employee</span>*&gt;(p) != <span class="tok-num">NULL</span>);  <span class="tok-com">// שורה ב</span></code></pre>
+  ההיררכיה: Developer ← Employee ← Person, והאובייקט האמיתי הוא <code>Developer</code>.<br>
+  • <b>שורה א</b> — <code>typeid</code> דורש טיפוס מדויק: הטיפוס האמיתי הוא Developer, לא Employee ← <b>0</b>.<br>
+  • <b>שורה ב</b> — Developer <b>הוא כן</b> סוג של Employee ← ההמרה מצליחה ← לא NULL ← <b>1</b>.<br>
+  תוצאה: <b>01</b>. אותו אובייקט נותן 0 ל-<code>typeid</code> ו-1 ל-<code>dynamic_cast</code>, כי אחד דורש התאמה מדויקת והשני מסתפק ב"הוא סוג של".</p></div>
 
   <p class="maps">מכסה שאלות: 6, 8, 15, 17, 18</p>
 </section>
