@@ -571,6 +571,25 @@ p3 = p1;           <span class="tok-com">// p3 כבר קיים → אופרטו�
 p.<span class="tok-fn">getX</span>();   <span class="tok-com">// מותר</span>
 p.<span class="tok-fn">setX</span>(<span class="tok-num">9</span>); <span class="tok-com">// שגיאת קומפילציה! אסור לשנות אובייקט const</span></code></pre>
 
+  <h4>const על פרמטרים, ערך החזרה, ושרשור</h4>
+  <p>‎<code>const</code> מופיע בעוד שני מקומות חשובים. <b>על פרמטר</b> (<code>const Point&amp; p</code>): הבטחה שהפונקציה לא תשנה את הארגומנט. <b>על ערך החזרה</b> (<code>const char* getName()</code>): מונע מהקורא לשנות את מה שהוחזר.</p>
+  <pre><code><span class="tok-key">const</span> <span class="tok-key">char</span>* <span class="tok-fn">getName</span>() <span class="tok-key">const</span> { <span class="tok-key">return</span> name; }
+<span class="tok-fn">strcpy</span>(obj.<span class="tok-fn">getName</span>(), <span class="tok-str">"x"</span>);  <span class="tok-com">// ❌ לא מתקמפל — אסור לשנות const char*</span></code></pre>
+  <p>שרשור מתודות (<b>method chaining</b>) עובד כשמתודה מחזירה <code>*this</code> ב-reference: <code>a.inc().inc()</code>. שימי לב לניואנס const:</p>
+  <div class="box tip"><span class="label">const ושרשור</span>מתודה שמחזירה <code>A&amp;</code> מאפשרת שרשור על אובייקט רגיל. אבל על אובייקט <code>const</code> אפשר לשרשר רק מתודות שמחזירות <code>const A&amp;</code> — כי כל חוליה בשרשרת חייבת גם היא להיות בטוחה על const.</p></div>
+
+  <h3>mutable — חריג לכלל ה-const</h3>
+  <p><code>mutable</code> על שדה מאפשר לשנות אותו <b>גם</b> באובייקט <code>const</code> או ממתודת <code>const</code>. השימוש הנפוץ: caching — לשמור תוצאה מחושבת בלי "לשבור" את ההבטחה שהמתודה לא משנה את המצב הלוגי.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Circle</span> {
+    <span class="tok-key">double</span> r;
+    <span class="tok-key">mutable</span> <span class="tok-key">double</span> cachedArea;   <span class="tok-com">// ניתן לשינוי גם ממתודת const</span>
+<span class="tok-key">public</span>:
+    <span class="tok-key">double</span> <span class="tok-fn">area</span>() <span class="tok-key">const</span> {
+        cachedArea = <span class="tok-num">3.14</span> * r * r;   <span class="tok-com">// מותר בזכות mutable, למרות const</span>
+        <span class="tok-key">return</span> cachedArea;
+    }
+};</code></pre>
+
   <h3>static — משותף לכל האובייקטים</h3>
   <p>בדרך כלל לכל אובייקט יש עותק משלו של כל שדה. שדה <code>static</code> הוא היוצא מן הכלל: יש ממנו <b>עותק אחד בלבד</b> המשותף לכל אובייקטי המחלקה. דוגמה קלאסית: לספור כמה אובייקטים נוצרו — מגדילים מונה static בכל בנאי.</p>
   <pre><code><span class="tok-key">class</span> <span class="tok-type">Widget</span> {
@@ -580,8 +599,24 @@ p.<span class="tok-fn">setX</span>(<span class="tok-num">9</span>); <span class=
 };
 <span class="tok-key">int</span> <span class="tok-type">Widget</span>::count = <span class="tok-num">0</span>;  <span class="tok-com">// חייב אתחול פעם אחת מחוץ למחלקה</span></code></pre>
 
+  <h4>מתודות static</h4>
+  <p>לא רק שדות — גם <b>מתודות</b> יכולות להיות <code>static</code>. מתודה כזו שייכת למחלקה כולה, לא לאובייקט מסוים: קוראים לה עם שם המחלקה (<code>Widget::getCount()</code>), אין לה <code>this</code>, והיא יכולה לגשת <b>רק</b> לשדות static (כי אין לה אובייקט קונקרטי לגשת לשדותיו).</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Widget</span> {
+    <span class="tok-key">static</span> <span class="tok-key">int</span> count;
+<span class="tok-key">public</span>:
+    <span class="tok-key">static</span> <span class="tok-key">int</span> <span class="tok-fn">getCount</span>() { <span class="tok-key">return</span> count; }  <span class="tok-com">// אין this, רק שדות static</span>
+};
+cout &lt;&lt; <span class="tok-type">Widget</span>::<span class="tok-fn">getCount</span>();   <span class="tok-com">// קוראים דרך המחלקה, בלי אובייקט</span></code></pre>
+
   <h3>friend — רשות גישה ל-private</h3>
   <p>פונקציה או מחלקה שמוכרזת <code>friend</code> מקבלת גישה לשדות ה-private של המחלקה, למרות שאינה חלק ממנה (הוסבר במלואו במודול 0). השימוש הכי נפוץ: <code>operator&lt;&lt;</code> — פונקציה חופשית שצריכה לקרוא את השדות כדי להדפיס (מודול 3).</p>
+  <h4>friend class — מחלקה שלמה כחברה</h4>
+  <p>אפשר להכריז לא רק על פונקציה בודדת כ-<code>friend</code>, אלא על <b>מחלקה שלמה</b>. אז לכל המתודות של אותה מחלקה יש גישה ל-private:</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">Node</span> {
+    <span class="tok-key">int</span> data;
+    <span class="tok-key">friend</span> <span class="tok-key">class</span> <span class="tok-type">LinkedList</span>;   <span class="tok-com">// כל LinkedList רשאית לגשת ל-data</span>
+};</code></pre>
+  <p>שימושי כשמחלקה אחת "מנהלת" את הפנימיות של אחרת — למשל רשימה מקושרת שצריכה גישה חופשית לצמתים שלה. שימי לב: friendship <b>לא</b> הדדית ו<b>לא</b> עוברת בירושה.</p>
 
   <h3>המרות אוטומטיות (auto-casting) ו-explicit</h3>
   <p>בנאי עם <b>פרמטר יחיד</b> משמש גם כ"כלל המרה": המהדר יכול להפוך אוטומטית ערך מהטיפוס לאובייקט. למשל אם יש <code>Point(int)</code>, אז פונקציה שמצפה ל-<code>Point</code> תקבל גם <code>int</code> ותמיר אותו לבד. המילה <code>explicit</code> לפני הבנאי <b>חוסמת</b> את ההמרה הסמויה הזו ומחייבת המרה מפורשת.</p>
@@ -600,6 +635,25 @@ p.<span class="tok-fn">setX</span>(<span class="tok-num">9</span>); <span class=
     <span class="tok-key">catch</span>(<span class="tok-key">int</span>) { cout&lt;&lt;<span class="tok-str">"E"</span>; }
 }   <span class="tok-com">// ידפיס: CE  (ה-D לא מודפס!)</span></code></pre>
   <p>ה-"C" מודפס, אז נזרק חריג ← הבנייה נכשלה ← אין הרסן ← אין "D". ה-catch מדפיס "E". סה"כ <b>CE</b>.</p>
+
+  <h4>למה בכלל חריגים ולא קודי שגיאה?</h4>
+  <p>הדרך הישנה לדווח על שגיאה היא להחזיר קוד שגיאה כערך החזרה. הבעיות: קל <b>לשכוח</b> לבדוק את הקוד; קוד מספרי לא נושא מידע עשיר; ול<b>בנאים והרסנים אין ערך החזרה</b> בכלל, אז אין דרך לדווח דרכם. חריגים פותרים את שלושתן — הם "קופצים" עד ה-<code>catch</code> המתאים ולא ניתן להתעלם מהם בשקט.</p>
+
+  <h4>מחלקות חריגים וכמה catch</h4>
+  <p>אפשר לזרוק <b>אובייקט של מחלקה</b> כחריג (לא רק <code>int</code>), וכך לשאת מידע. אפשר לשרשר כמה <code>catch</code> — הראשון שמתאים לטיפוס תופס. <code>catch(...)</code> תופס <b>כל</b> חריג שנותר.</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">DivByZero</span> {
+<span class="tok-key">public</span>:
+    <span class="tok-key">const</span> <span class="tok-key">char</span>* <span class="tok-fn">msg</span>() { <span class="tok-key">return</span> <span class="tok-str">"division by zero"</span>; }
+};
+
+<span class="tok-key">try</span> {
+    <span class="tok-key">if</span> (b == <span class="tok-num">0</span>) <span class="tok-key">throw</span> <span class="tok-type">DivByZero</span>();   <span class="tok-com">// זורק אובייקט</span>
+}
+<span class="tok-key">catch</span> (<span class="tok-type">DivByZero</span>&amp; e) { cout &lt;&lt; e.<span class="tok-fn">msg</span>(); }  <span class="tok-com">// תופס ב-reference</span>
+<span class="tok-key">catch</span> (<span class="tok-key">int</span> code)       { cout &lt;&lt; code; }       <span class="tok-com">// טיפוס אחר</span>
+<span class="tok-key">catch</span> (...)             { cout &lt;&lt; <span class="tok-str">"unknown"</span>; }  <span class="tok-com">// כל השאר</span></code></pre>
+  <div class="box tip"><span class="label">למה תופסים ב-reference (<code>catch(DivByZero&amp; e)</code>)?</span>
+  כדי לא ליצור עותק מיותר של אובייקט החריג, ו(בהיררכיית חריגים) כדי לא לחתוך אותו (slicing, מודול 6). סדר ה-<code>catch</code> חשוב: הספציפי לפני הכללי.</p></div>
 
   <p class="maps">מכסה שאלה: 19</p>
 </section>
