@@ -1191,6 +1191,10 @@ f.<span class="tok-fn">read</span>((<span class="tok-key">char</span>*)&amp;len,
 name = <span class="tok-key">new</span> <span class="tok-key">char</span>[len+<span class="tok-num">1</span>];             <span class="tok-com">// מקצים לפי האורך שנקרא</span>
 f.<span class="tok-fn">read</span>(name, len);
 name[len] = <span class="tok-str">'\0'</span>;</code></pre>
+  <div class="box key"><span class="label">למה שומרים את האורך קודם?</span>
+  בקובץ בינארי הבייטים צמודים <b>בלי מפריד</b>. בטעינה, כשמגיעים לשם — אין דרך לדעת כמה בייטים לקרוא ואיפה לעצור. לכן קוראים קודם מספר בגודל <b>ידוע וקבוע</b> (<code>sizeof(int)</code>), והוא מכריז כמה בייטים באים אחריו.<br>
+  שתי הכתיבות לא חוזרות על עצמן: הראשונה שומרת <b>כמה</b> (מטא-מידע), השנייה את <b>התוכן</b> — כמו מדבקת משקל על חבילה, ואז החבילה עצמה.<br>
+  בטקסט (<code>&lt;&lt;</code>/<code>&gt;&gt;</code>) לא צריך את זה כי הרווח/ירידת השורה משמשים מפריד טבעי; בבינארי אין מפריד, אז את מספקת אותו בעצמך.</p></div>
   <div class="box trap"><span class="label">בעיית המצביעים בסריאליזציה</span>
   אסור לשמור <b>מצביע</b> כמו שהוא — הכתובת חסרת משמעות בהרצה הבאה. שומרים תמיד את <b>מה שהוא מצביע עליו</b> (התוכן), ובטעינה מקצים זיכרון חדש. אותה בעיה כמו העתקה עמוקה (מודול 3).</p></div>
 
