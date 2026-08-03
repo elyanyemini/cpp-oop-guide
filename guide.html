@@ -1227,6 +1227,9 @@ cout &lt;&lt; v[<span class="tok-num">0</span>] &lt;&lt; v.<span class="tok-fn">
   <p>אובייקט שמצביע לאיבר במכולה ומאפשר לעבור עליה — כמו מצביע כללי. <code>begin()</code> מחזיר איטרטור לאיבר הראשון, <code>end()</code> ל"אחרי האחרון".</p>
   <pre><code><span class="tok-key">for</span> (<span class="tok-type">vector</span>&lt;<span class="tok-key">int</span>&gt;::<span class="tok-type">iterator</span> it = v.<span class="tok-fn">begin</span>(); it != v.<span class="tok-fn">end</span>(); ++it)
     cout &lt;&lt; *it;</code></pre>
+  <div class="box key"><span class="label">מקביל ל-<code>v[i]</code></span>
+  הלולאה הזו שקולה ל-<code>for (int i=0; i&lt;v.size(); ++i) cout &lt;&lt; v[i];</code>. בכל סיבוב <code>it</code> "מצביע" על איבר אחר, ו-<code>*it</code> מחזיר את הערך — כמו <code>v[i]</code>. שלוש נקודות דיוק:<br>
+  <b>1.</b> <code>*it</code> נותן את האיבר עצמו (כמו <code>*</code> על מצביע). <b>2.</b> <code>++it</code> מקדם לאיבר <b>הבא</b> — לא בהכרח +1 בזיכרון; ב-<code>list</code> הוא קופץ לחוליה הבאה. זה מה שמאפשר תחביר אחיד לכל מכולה. <b>3.</b> <code>end()</code> הוא המקום <b>אחרי</b> האחרון, לכן התנאי הוא <code>!=</code> ולא <code>&lt;=</code> (ובמכולה ריקה <code>begin()==end()</code> והלולאה לא רצה).</p></div>
 
   <h3>Functors (אובייקטי פונקציה)</h3>
   <p>אובייקט שאפשר "לקרוא לו" כמו פונקציה, כי הוא מעמיס את <code>operator()</code>. שימושי כדי להעביר לוגיקה לאלגוריתמים.</p>
