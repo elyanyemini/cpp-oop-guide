@@ -1092,6 +1092,46 @@ cout &lt;&lt; (<span class="tok-key">dynamic_cast</span>&lt;<span class="tok-typ
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 20)</span>
   <code>NamedBuffer</code> יורשת מ-<code>Buffer</code> (שיש לו Rule of Three), ומוסיפה שדה דינמי <code>char* name</code> עם הרסן שמשחרר אותו. חסר לה <b>בנאי העתקה</b> ו-<code>operator=</code> משלה עבור <code>name</code> — אחרת העתקה של NamedBuffer תעתיק את המצביע <code>name</code> באופן שטחי ← מחיקה כפולה.</p></div>
 
+  <p>נראה את זה על הדוגמה במלואה. נניח ש-<code>Buffer</code> מנהל נכון את המשאב שלו (<code>data</code>) ומקיים Rule of Three. היורשת מוסיפה שדה דינמי <b>חדש</b> — <code>name</code>:</p>
+  <pre><code><span class="tok-key">class</span> <span class="tok-type">NamedBuffer</span> : <span class="tok-key">public</span> <span class="tok-type">Buffer</span> {
+    <span class="tok-key">char</span>* name;
+<span class="tok-key">public</span>:
+    <span class="tok-fn">NamedBuffer</span>(<span class="tok-type">size_t</span> n, <span class="tok-key">const</span> <span class="tok-key">char</span>* nm) : <span class="tok-fn">Buffer</span>(n) {
+        name = <span class="tok-key">new</span> <span class="tok-key">char</span>[<span class="tok-fn">strlen</span>(nm) + <span class="tok-num">1</span>];
+        <span class="tok-fn">strcpy</span>(name, nm);
+    }
+    <span class="tok-fn">~NamedBuffer</span>() { <span class="tok-key">delete</span>[] name; }   <span class="tok-com">// משחררת את name</span>
+    <span class="tok-com">// ... וכאן חסר משהו</span>
+};</code></pre>
+
+  <p>בלי בנאי העתקה ו-<code>operator=</code>, הקומפיילר מייצר אותם לבד. ההעתקה שהוא מייצר קוראת לבנאי ההעתקה של הבסיס (מצוין — <code>Buffer</code> יודע להעתיק את <code>data</code> נכון), ואז מעתיקה כל שדה של היורשת חבר-חבר. אבל <code>name</code> הוא מצביע, והעתקת מצביע פירושה העתקת ה<b>כתובת</b>, לא התוכן:</p>
+  <pre><code><span class="tok-type">NamedBuffer</span> a(<span class="tok-num">10</span>, <span class="tok-str">"hello"</span>);
+<span class="tok-type">NamedBuffer</span> b = a;   <span class="tok-com">// העתקה שטחית: a.name ו-b.name אותה כתובת</span>
+<span class="tok-com">// בסוף הסקופ שני הרסנים מריצים delete[] name על אותו בלוק ← מחיקה כפולה</span></code></pre>
+
+  <p><b>התיקון</b> — היורשת מיישמת בעצמה את השלושה, ובכל אחד דואגת גם שהבסיס יטופל וגם ש-<code>name</code> יועתק לעומק:</p>
+  <pre><code><span class="tok-fn">NamedBuffer</span>(<span class="tok-key">const</span> <span class="tok-type">NamedBuffer</span>&amp; o)
+    : <span class="tok-fn">Buffer</span>(o)   <span class="tok-com">// ← מפעיל את בנאי ההעתקה של הבסיס</span>
+{
+    name = <span class="tok-key">new</span> <span class="tok-key">char</span>[<span class="tok-fn">strlen</span>(o.name) + <span class="tok-num">1</span>];   <span class="tok-com">// זיכרון חדש משלנו</span>
+    <span class="tok-fn">strcpy</span>(name, o.name);
+}
+
+<span class="tok-type">NamedBuffer</span>&amp; <span class="tok-fn">operator=</span>(<span class="tok-key">const</span> <span class="tok-type">NamedBuffer</span>&amp; o) {
+    <span class="tok-key">if</span> (<span class="tok-key">this</span> != &amp;o) {
+        <span class="tok-type">Buffer</span>::<span class="tok-fn">operator=</span>(o);   <span class="tok-com">// ← מפעיל את operator= של הבסיס</span>
+        <span class="tok-key">delete</span>[] name;          <span class="tok-com">// משחררים את הישן</span>
+        name = <span class="tok-key">new</span> <span class="tok-key">char</span>[<span class="tok-fn">strlen</span>(o.name) + <span class="tok-num">1</span>];
+        <span class="tok-fn">strcpy</span>(name, o.name);
+    }
+    <span class="tok-key">return</span> *<span class="tok-key">this</span>;
+}</code></pre>
+
+  <div class="box key"><span class="label">שתי הנקודות שהמבחן בודק</span>
+  <b>1. להפעיל במפורש את גרסת הבסיס:</b> בבנאי דרך רשימת האתחול <code>: Buffer(o)</code>, וב-operator= דרך <code>Buffer::operator=(o)</code>. בלי זה חלק הבסיס לא יטופל נכון.<br>
+  <b>2. עותק עמוק לכל מצביע:</b> תמיד <code>new</code> + <code>strcpy</code> (זיכרון חדש + העתקת תוכן), אף פעם לא העתקת המצביע עצמו. זה ההבדל בין עותק עמוק לשטחי.<br>
+  המסר: כל שכבה בהיררכיה אחראית למשאבים שהיא עצמה מוסיפה — והיורשת חייבת גם להפעיל את פעולות הבסיס.</p></div>
+
   <p class="maps">מכסה שאלות: 8, 20</p>
 </section>
 
