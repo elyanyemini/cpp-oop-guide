@@ -450,6 +450,19 @@ p3 = p1;           <span class="tok-com">// p3 כבר קיים → אופרטו�
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 5)</span>
   <code>int operator[](int i)</code> מחזיר <b>עותק</b> ← אי אפשר להשים אליו. <code>const int&amp;</code> מאפשר <b>קריאה בלבד</b>. רק <code>int&amp;</code> מאפשר גם קריאה וגם כתיבה.</p></div>
 
+  <div class="box tip"><span class="label">שתי גרסאות של operator[]: const ולא-const (מועד א' תשפ"ו, שאלה 3)</span>
+  לפעמים כבר יש גרסת <code>const</code> שמחזירה <b>עותק</b>, כי היא חייבת לעבוד גם על אובייקט const. אם רוצים לאפשר גם <code>v[0] = 7</code>, לא משנים אותה. <b>מוסיפים לידה</b> גרסה לא-const שמחזירה <code>int&amp;</code>. מותר לכתוב שתי מתודות עם אותה חתימה כשההבדל היחיד ביניהן הוא ה-<code>const</code>:
+<pre><code><span class="tok-key">class</span> <span class="tok-type">Vec3</span> {
+    <span class="tok-key">int</span> data[<span class="tok-num">3</span>];
+<span class="tok-key">public</span>:
+    <span class="tok-key">int</span>  operator[](<span class="tok-key">int</span> i) <span class="tok-key">const</span> { <span class="tok-key">return</span> data[i]; }  <span class="tok-com">// לאובייקט const: קריאה בלבד</span>
+    <span class="tok-key">int</span>&amp; operator[](<span class="tok-key">int</span> i)       { <span class="tok-key">return</span> data[i]; }  <span class="tok-com">// לאובייקט רגיל: גם כתיבה</span>
+};
+
+<span class="tok-type">Vec3</span> v;        v[<span class="tok-num">0</span>] = <span class="tok-num">7</span>;       <span class="tok-com">// ✅ נבחרת הגרסה הלא-const</span>
+<span class="tok-key">const</span> <span class="tok-type">Vec3</span> cv; <span class="tok-key">int</span> x = cv[<span class="tok-num">0</span>];  <span class="tok-com">// ✅ נבחרת גרסת ה-const</span></code></pre>
+  הקומפיילר בוחר לפי האובייקט: על אובייקט const נקראת גרסת ה-const, ועל אובייקט רגיל נקראת הגרסה הלא-const. אי אפשר פשוט להחליף את גרסת ה-const כך שתחזיר <code>int&amp;</code>, כי בתוך מתודת const השדות הם const, ומותר להחזיר מהם רק <code>const int&amp;</code>, כלומר קריאה בלבד.</div>
+
   <h3>operator&lt;&lt; ו-operator&gt;&gt; — הדפסה וקלט</h3>
   <p>כדי לכתוב <code>cout &lt;&lt; p;</code>, האופרטור חייב להיות <b>פונקציה חופשית</b>, כי האופרנד השמאלי הוא <code>cout</code> (מסוג <code>ostream</code>) — לא האובייקט שלנו (ראי הכלל למעלה). מגדירים אותו כ-<code>friend</code> כדי שיוכל לגשת לשדות ה-private, ומחזירים את הזרם כדי לאפשר שרשור.</p>
   <pre><code><span class="tok-key">friend</span> <span class="tok-type">ostream</span>&amp; <span class="tok-fn">operator&lt;&lt;</span>(<span class="tok-type">ostream</span>&amp; out, <span class="tok-key">const</span> <span class="tok-type">FVector</span>&amp; a){
@@ -640,6 +653,17 @@ cout &lt;&lt; <span class="tok-type">Widget</span>::<span class="tok-fn">getCoun
 }   <span class="tok-com">// ידפיס: CE  (ה-D לא מודפס!)</span></code></pre>
   <p>ה-"C" מודפס, אז נזרק חריג ← הבנייה נכשלה ← אין הרסן ← אין "D". ה-catch מדפיס "E". סה"כ <b>CE</b>.</p>
 
+  <div class="box trap"><span class="label">ומה עם אובייקטים שכבר נבנו באותו בלוק? (מועד ב' תשפ"ו, שאלה 10)</span>
+  כשחריג יוצא מבלוק ה-<code>try</code>, כל האובייקטים המקומיים <b>שהספיקו להיבנות עד הסוף</b> נהרסים, בסדר הפוך לבנייה, <b>לפני</b> שה-catch רץ. רק האובייקט שהבנאי שלו זרק לא נהרס.
+<pre><code><span class="tok-key">struct</span> <span class="tok-type">A</span> { <span class="tok-type">A</span>(){ cout&lt;&lt;<span class="tok-str">"A"</span>; }               ~<span class="tok-type">A</span>(){ cout&lt;&lt;<span class="tok-str">"a"</span>; } };
+<span class="tok-key">struct</span> <span class="tok-type">B</span> { <span class="tok-type">B</span>(){ cout&lt;&lt;<span class="tok-str">"B"</span>; <span class="tok-key">throw</span> <span class="tok-num">1</span>; }     ~<span class="tok-type">B</span>(){ cout&lt;&lt;<span class="tok-str">"b"</span>; } };
+
+<span class="tok-key">int</span> <span class="tok-fn">main</span>() {
+    <span class="tok-key">try</span> { <span class="tok-type">A</span> a; <span class="tok-type">B</span> b; cout&lt;&lt;<span class="tok-str">"X"</span>; }
+    <span class="tok-key">catch</span>(<span class="tok-key">int</span>) { cout&lt;&lt;<span class="tok-str">"C"</span>; }
+}   <span class="tok-com">// ידפיס: ABaC</span></code></pre>
+  a נבנה במלואו, ולכן הוא נהרס ומודפס "a". b לא סיים להיבנות, ולכן אין "b". השורה של "X" לא מתבצעת, ובסוף ה-catch מדפיס "C". הכלל: <b>הרסן רץ רק על מה שנבנה במלואו</b>, וכל מה שנבנה במלואו נהרס בדרך החוצה מהבלוק.</div>
+
   <h4>למה בכלל חריגים ולא קודי שגיאה?</h4>
   <p>הדרך הישנה לדווח על שגיאה היא להחזיר קוד שגיאה כערך החזרה. הבעיות: קל <b>לשכוח</b> לבדוק את הקוד; קוד מספרי לא נושא מידע עשיר; ול<b>בנאים והרסנים אין ערך החזרה</b> בכלל, אז אין דרך לדווח דרכם. חריגים פותרים את שלושתן — הם "קופצים" עד ה-<code>catch</code> המתאים ולא ניתן להתעלם מהם בשקט.</p>
 
@@ -694,6 +718,22 @@ cout &lt;&lt; <span class="tok-type">Widget</span>::<span class="tok-fn">getCoun
   </table>
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 9)</span>
   ב-<code>class B : protected A</code>, שדה שהיה <code>public</code> ב-A הופך ל-<code>protected</code> ביחס ל-B. לכן <b>בתוך</b> מתודה של B מותר לגשת אליו, אבל <b>מבחוץ</b> (<code>b.x</code> ב-main) — שגיאת קומפילציה.</p></div>
+
+  <div class="box trap"><span class="label">שרשרת של שלוש רמות: מה הנכדה רואה? (מועד ב' שאלה 3, מועד א' שאלה 2)</span>
+  סוג הירושה משנה את ההרשאה <b>כלפי כל מי שבא אחרי B</b>, כולל מחלקות שיורשות מ-B:
+<pre><code><span class="tok-key">class</span> <span class="tok-type">A</span> { <span class="tok-key">public</span>: <span class="tok-key">int</span> x; <span class="tok-key">protected</span>: <span class="tok-key">int</span> y; };
+
+<span class="tok-key">class</span> <span class="tok-type">B</span> : <span class="tok-key">protected</span> <span class="tok-type">A</span> { };    <span class="tok-com">// בתוך B: x ו-y הם protected</span>
+<span class="tok-key">class</span> <span class="tok-type">C</span> : <span class="tok-key">public</span> <span class="tok-type">B</span> {
+    <span class="tok-key">void</span> <span class="tok-fn">g</span>() { x = <span class="tok-num">3</span>; y = <span class="tok-num">4</span>; }  <span class="tok-com">// ✅ protected נגיש ליורשת</span>
+};
+<span class="tok-com">// main:  c.x = 5;            // ❌ protected לא נגיש מבחוץ</span>
+
+<span class="tok-key">class</span> <span class="tok-type">P</span> : <span class="tok-key">private</span> <span class="tok-type">A</span> { };      <span class="tok-com">// בתוך P: x ו-y הם private</span>
+<span class="tok-key">class</span> <span class="tok-type">Q</span> : <span class="tok-key">public</span> <span class="tok-type">P</span> {
+    <span class="tok-key">void</span> <span class="tok-fn">g</span>() { x = <span class="tok-num">1</span>; }       <span class="tok-com">// ❌ private של P לא נגיש אפילו ליורשת שלה</span>
+};</code></pre>
+  בקיצור: אחרי ירושת <code>protected</code> הנכדה <b>עדיין</b> ניגשת לשדות, ורק מבחוץ אסור. אחרי ירושת <code>private</code> גם הנכדה כבר לא ניגשת. רק B עצמה ניגשת, כי מבחינתה ההרשאות נקבעות לפי מה שהוגדר ב-A.</div>
 
   <h3>⭐ סדר בנייה בירושה + העברת פרמטרים לבנאי הבסיס</h3>
   <p>כשנבנה אובייקט יורש, קודם רץ הבנאי של <b>הבסיס</b>, אחר כך בנאי השדות (member objects) לפי סדר הכרזתם, ולבסוף גוף הבנאי של היורשת. אם לבנאי הבסיס יש פרמטרים, היורשת מעבירה אותם דרך <b>init list</b>:</p>
@@ -907,6 +947,21 @@ cout &lt;&lt; (<span class="tok-key">dynamic_cast</span>&lt;<span class="tok-typ
   • <b>שורה ב</b> — Developer <b>הוא כן</b> סוג של Employee ← ההמרה מצליחה ← לא NULL ← <b>1</b>.<br>
   תוצאה: <b>01</b>. אותו אובייקט נותן 0 ל-<code>typeid</code> ו-1 ל-<code>dynamic_cast</code>, כי אחד דורש התאמה מדויקת והשני מסתפק ב"הוא סוג של".</p></div>
 
+  <div class="box key"><span class="label">typeid על הפניה, ו-typeid על המצביע עצמו (מועד ב' תשפ"ו, שאלה 6)</span>
+  ‎<code>typeid(r)</code> על <b>הפניה</b> לאובייקט פולימורפי מתנהג בדיוק כמו <code>typeid(*p)</code>: הוא מחזיר את הטיפוס <b>המדויק</b> בזמן ריצה. לעומת זאת, <code>typeid(p)</code> בלי כוכבית בודק את <b>המצביע עצמו</b>, ולכן מחזיר את הטיפוס הסטטי שלו.
+<pre><code><span class="tok-key">class</span> <span class="tok-type">Animal</span>  { <span class="tok-key">public</span>: <span class="tok-key">virtual</span> ~<span class="tok-type">Animal</span>(){} };
+<span class="tok-key">class</span> <span class="tok-type">Dog</span>     : <span class="tok-key">public</span> <span class="tok-type">Animal</span> {};
+<span class="tok-key">class</span> <span class="tok-type">Bulldog</span> : <span class="tok-key">public</span> <span class="tok-type">Dog</span> {};
+
+<span class="tok-type">Bulldog</span> b;
+<span class="tok-type">Animal</span>&amp; r = b;
+<span class="tok-type">Animal</span>* p = &amp;b;
+<span class="tok-key">typeid</span>(r) == <span class="tok-key">typeid</span>(<span class="tok-type">Bulldog</span>)     <span class="tok-com">// 1 — הטיפוס המדויק</span>
+<span class="tok-key">typeid</span>(r) == <span class="tok-key">typeid</span>(<span class="tok-type">Dog</span>)         <span class="tok-com">// 0 — Bulldog ≠ Dog</span>
+<span class="tok-key">dynamic_cast</span>&lt;<span class="tok-type">Dog</span>*&gt;(&amp;r) != <span class="tok-key">nullptr</span> <span class="tok-com">// 1 — Bulldog הוא סוג של Dog</span>
+<span class="tok-key">typeid</span>(p) == <span class="tok-key">typeid</span>(<span class="tok-type">Animal</span>*)     <span class="tok-com">// 1 — בלי כוכבית: טיפוס המצביע</span></code></pre>
+  שימי לב לזוג השורות האמצעיות: אותו אובייקט "נכשל" ב-<code>typeid</code> מול Dog אבל "מצליח" ב-<code>dynamic_cast</code> ל-Dog. זה בדיוק ההבדל בין התאמה מדויקת לבין "הוא סוג של".</div>
+
   <p class="maps">מכסה שאלות: 6, 8, 15, 17, 18</p>
 </section>
 
@@ -1001,6 +1056,18 @@ cout &lt;&lt; (<span class="tok-key">dynamic_cast</span>&lt;<span class="tok-typ
   </table>
   <p>המסקנה: <code>virtual</code> inheritance היא לא "תמיד נכונה". משתמשים בה רק כשעותק <b>אחד</b> של האב המשותף הוא ההגיוני. כשכל תת-אובייקט אמור להיות עצמאי — משאירים ירושה רגילה.</p>
 
+  <h3>⭐ ירושה וירטואלית רק בצד אחד (מועד ב' תשפ"ו, שאלה 5)</h3>
+  <p>מה קורה אם רק אחד מהמסלולים יורש את A כ-<code>virtual</code>? אז אין יהלום אחד: ל-D יש <b>שני עותקים</b> של A. עותק וירטואלי אחד, דרך B, שהמחלקה הנגזרת ביותר (D) בונה ראשון. ועותק רגיל נוסף בתוך C, ש-C בונה בעצמה כרגיל.</p>
+<pre><code><span class="tok-key">struct</span> <span class="tok-type">A</span> { <span class="tok-type">A</span>(){ cout&lt;&lt;<span class="tok-str">"A"</span>; } };
+<span class="tok-key">struct</span> <span class="tok-type">B</span> : <span class="tok-key">virtual</span> <span class="tok-key">public</span> <span class="tok-type">A</span> { <span class="tok-type">B</span>(){ cout&lt;&lt;<span class="tok-str">"B"</span>; } };   <span class="tok-com">// וירטואלית</span>
+<span class="tok-key">struct</span> <span class="tok-type">C</span> : <span class="tok-key">public</span> <span class="tok-type">A</span>         { <span class="tok-type">C</span>(){ cout&lt;&lt;<span class="tok-str">"C"</span>; } };   <span class="tok-com">// רגילה!</span>
+<span class="tok-key">struct</span> <span class="tok-type">D</span> : <span class="tok-key">public</span> <span class="tok-type">B</span>, <span class="tok-key">public</span> <span class="tok-type">C</span> { <span class="tok-type">D</span>(){ cout&lt;&lt;<span class="tok-str">"D"</span>; } };
+
+<span class="tok-key">int</span> <span class="tok-fn">main</span>() { <span class="tok-type">D</span> d; }   <span class="tok-com">// ידפיס: ABACD</span></code></pre>
+  <p>הסדר: קודם <b>כל הבסיסים הווירטואליים</b> (A), אחר כך הבסיסים הישירים לפי הסדר ברשימת הירושה. B מודפס, ואז C, שיש לה עותק <b>משלה</b> של A, ולכן מודפס שוב A ואחריו C. בסוף D. כך מתקבל <b>ABACD</b>. ההריסה בסדר הפוך בדיוק.</p>
+  <div class="box trap"><span class="label">מלכודת מבחן</span>
+  ‎<code>ABACD</code> נראה כמו "בלי virtual בכלל", אבל כאן הוא נובע מ-virtual <b>חלקי</b>. בגלל שיש שני עותקים של A, גישה כמו <code>d.x</code> היא <b>ambiguous</b> (שגיאת קומפילציה), בדיוק כמו ביהלום בלי virtual. ואם לבנאי של A יש פרמטרים, D חייבת לאתחל את העותק הווירטואלי, ו-C מאתחלת את העותק שלה.</div>
+
   <p class="maps">מכסה שאלות: 11, 12, 14</p>
 </section>
 
@@ -1022,6 +1089,18 @@ cout &lt;&lt; (<span class="tok-key">dynamic_cast</span>&lt;<span class="tok-typ
   <p>הקומפיילר מסיק את <code>T</code> מהארגומנטים. אם יש <b>T אחד</b> בחתימה אבל הארגומנטים הם <b>מטיפוסים שונים</b>, אין דרך להחליט מהו T ← שגיאת קומפילציה.</p>
   <div class="box trap"><span class="label">מלכודת מבחן (שאלה 7)</span>
   <code>maxT(1, 2.5)</code>: הארגומנט הראשון int, השני double, אבל שניהם חייבים להיות אותו <code>T</code> ← הקומפיילר לא יכול להסיק T יחיד ← <b>שגיאת קומפילציה</b>. (אין המרה אוטומטית ב-template כדי "ליישר" את הטיפוסים.)</p></div>
+
+  <div class="box trap"><span class="label">שני פרמטרי תבנית, וטיפוס מפורש (מועד ב' תשפ"ו, שאלה 9)</span>
+  עם <b>שני</b> פרמטרי תבנית ההסקה מצליחה, כי כל ארגומנט מקבל טיפוס משלו. אבל צריך לשים לב ל<b>טיפוס ההחזרה</b>: אם הוא <code>T</code>, הערך שמוחזר מומר ל-T.
+<pre><code><span class="tok-key">template</span> &lt;<span class="tok-key">class</span> <span class="tok-type">T</span>, <span class="tok-key">class</span> <span class="tok-type">U</span>&gt;
+<span class="tok-type">T</span> <span class="tok-fn">choose</span>(<span class="tok-type">T</span> a, <span class="tok-type">U</span> b) { <span class="tok-key">return</span> (a &lt; b) ? a : b; }
+
+<span class="tok-fn">choose</span>(<span class="tok-num">3</span>, <span class="tok-num">2.5</span>)    <span class="tok-com">// T=int, U=double → 3&lt;2.5 שקרי → מוחזר b=2.5 → מומר ל-int → 2</span>
+<span class="tok-fn">choose</span>(<span class="tok-num">2.5</span>, <span class="tok-num">3</span>)    <span class="tok-com">// T=double        → 2.5&lt;3 אמת  → מוחזר a      → 2.5</span>
+
+maxT&lt;<span class="tok-key">double</span>&gt;(<span class="tok-num">1</span>, <span class="tok-num">2.5</span>)   <span class="tok-com">// T מפורש → אין הסקה, 1 מומר ל-double → 2.5</span>
+maxT&lt;<span class="tok-key">int</span>&gt;(<span class="tok-num">3</span>, <span class="tok-num">4.7</span>)      <span class="tok-com">// T מפורש → 4.7 נחתך ל-4 כבר במעבר → 4</span></code></pre>
+  שני כללים: (1) כשכותבים את הטיפוס במפורש (<code>maxT&lt;int&gt;</code>) אין הסקה, ולכן אין שגיאה, והארגומנטים מומרים לטיפוס שנבחר. (2) המרה מ-double ל-int <b>חותכת</b> את החלק העשרוני (4.7 נהיה 4), ולא מעגלת.</div>
 
   <h3>⭐ דרישות מהטיפוס T</h3>
   <p>ה-template משתמש באופרטורים על T (למשל <code>==</code>, <code>&lt;&lt;</code>). הקוד מתקמפל רק כשמייצרים ממנו גרסה עבור טיפוס שתומך באותם אופרטורים. אם הטיפוס לא תומך — <b>השגיאה מתגלה ברגע ה-instantiation</b> (יצירת הגרסה), בזמן קומפילציה.</p>
@@ -1204,6 +1283,35 @@ name[len] = <span class="tok-str">'\0'</span>;</code></pre>
 
   <h3>ניווט בקובץ וטעינה פולימורפית</h3>
   <p><code>seekg</code>/<code>seekp</code> מזיזים את מיקום הקריאה/כתיבה; <code>tellg</code>/<code>tellp</code> מחזירים אותו; <code>getline</code> קורא שורה שלמה. <b>טעינה פולימורפית:</b> כדי לשחזר אובייקט שלא יודעים את טיפוסו מראש, שומרים בקובץ <b>קוד טיפוס</b> לפני הנתונים, ובטעינה קוראים אותו קודם כדי לדעת איזה אובייקט ליצור.</p>
+
+  <div class="box trap"><span class="label">שמירה פולימורפית: קודם קוד טיפוס (מועד א' תשפ"ו, שאלה 4)</span>
+  במבחן הופיעו שתי תשובות כמעט זהות: "virtual save, ובכל יורשת קודם <code>Employee::save()</code> ואז המידע הייחודי", ואותו דבר <b>אבל קודם שומרים את סוג הטיפוס</b>. רק השנייה נכונה, כי בלי קוד טיפוס אי אפשר לדעת בטעינה איזה אובייקט ליצור.
+<pre><code><span class="tok-key">class</span> <span class="tok-type">Employee</span> {
+<span class="tok-key">protected</span>: <span class="tok-key">string</span> name; <span class="tok-key">int</span> salary;
+<span class="tok-key">public</span>:
+    <span class="tok-key">virtual</span> <span class="tok-key">void</span> <span class="tok-fn">save</span>(<span class="tok-key">ostream</span>&amp; out) <span class="tok-key">const</span> { out &lt;&lt; name &lt;&lt; <span class="tok-str">" "</span> &lt;&lt; salary &lt;&lt; <span class="tok-str">" "</span>; }
+    <span class="tok-key">virtual</span> <span class="tok-key">void</span> <span class="tok-fn">load</span>(<span class="tok-key">istream</span>&amp; in)        { in &gt;&gt; name &gt;&gt; salary; }
+    <span class="tok-key">virtual</span> ~<span class="tok-type">Employee</span>() {}
+};
+<span class="tok-key">class</span> <span class="tok-type">Manager</span> : <span class="tok-key">public</span> <span class="tok-type">Employee</span> {
+    <span class="tok-key">int</span> level;
+<span class="tok-key">public</span>:
+    <span class="tok-key">void</span> <span class="tok-fn">save</span>(<span class="tok-key">ostream</span>&amp; out) <span class="tok-key">const</span> <span class="tok-key">override</span> {
+        out &lt;&lt; <span class="tok-str">"M "</span>;            <span class="tok-com">// 1. קוד טיפוס</span>
+        <span class="tok-type">Employee</span>::<span class="tok-fn">save</span>(out);    <span class="tok-com">// 2. החלק המשותף</span>
+        out &lt;&lt; level &lt;&lt; endl;   <span class="tok-com">// 3. החלק הייחודי</span>
+    }
+    <span class="tok-key">void</span> <span class="tok-fn">load</span>(<span class="tok-key">istream</span>&amp; in) <span class="tok-key">override</span> { <span class="tok-type">Employee</span>::<span class="tok-fn">load</span>(in); in &gt;&gt; level; }
+};
+
+<span class="tok-com">// טעינה: קוראים קודם את הקוד, ולפיו יוצרים את האובייקט הנכון</span>
+<span class="tok-type">Employee</span>* <span class="tok-fn">loadOne</span>(<span class="tok-key">istream</span>&amp; in) {
+    <span class="tok-key">string</span> type;  in &gt;&gt; type;
+    <span class="tok-type">Employee</span>* e = (type == <span class="tok-str">"M"</span>) ? (<span class="tok-type">Employee</span>*)<span class="tok-key">new</span> <span class="tok-type">Manager</span> : (<span class="tok-type">Employee</span>*)<span class="tok-key">new</span> <span class="tok-type">Engineer</span>;
+    e-&gt;<span class="tok-fn">load</span>(in);              <span class="tok-com">// load וירטואלית: נקראת הגרסה של הטיפוס שנוצר</span>
+    <span class="tok-key">return</span> e;
+}</code></pre>
+  השמירה עצמה פולימורפית (<code>arr[i]-&gt;save(out)</code>), ולכן הלולאה לא צריכה לדעת מה הסוג. רק בטעינה יש מקום אחד שמכיר את כל הסוגים, וזה בלתי נמנע, כי צריך להחליט מה ליצור.</div>
 </section>
 
 <!-- ============ MODULE 11 ============ -->
