@@ -95,6 +95,10 @@
   <a data-go="m11">11 · STL</a>
   <div class="grouplabel">תרגול</div>
   <a data-go="quiz">בוחן אינטראקטיבי (20)</a>
+  <div class="grouplabel">מבחנים אמיתיים ומדומים</div>
+  <a data-go="examA">מועד א' תשפ"ו (10)</a>
+  <a data-go="examB">מועד ב' תשפ"ו (10)</a>
+  <a data-go="examC">מועד ג' מדומה (10)</a>
 </nav>
 
 <main>
@@ -1283,6 +1287,45 @@ cout &lt;&lt; add(<span class="tok-num">2</span>, <span class="tok-num">3</span>
   <div class="box key" id="finalMsg" style="display:none"></div>
 </section>
 
+<!-- ============ EXAMA ============ -->
+<section class="lesson" id="examA">
+  <h2 class="title">מבחן מועד א' · תשפ"ו סמסטר ב</h2>
+  <p class="lead">המבחן האמיתי מ-06/08/2026. לפי ניתוח המרצה, רוב השאלות היו קלות. שאלה 2 הייתה ממוצעת ושאלה 8 הייתה הקשה ביותר. 10 שאלות אמריקאיות, 80 דקות, חומר סגור. התשובות עורבבו, כך שהתשובה הנכונה לא תמיד במקום הראשון. לחצי על אפשרות כדי לראות אם צדקת ולקרוא הסבר.</p>
+  <div class="scorebar">
+    <span>ניקוד: <b id="examA-score">0</b> / 10</span>
+    <div class="progress"><i id="examA-bar"></i></div>
+    <button class="btn ghost" onclick="EXAM_QUIZ['examA'].reset()">איפוס</button>
+  </div>
+  <div id="examA-host"></div>
+  <div class="box key" id="examA-final" style="display:none"></div>
+</section>
+
+<!-- ============ EXAMB ============ -->
+<section class="lesson" id="examB">
+  <h2 class="title">מבחן מועד ב' · תשפ"ו סמסטר ב</h2>
+  <p class="lead">המבחן האמיתי של מועד ב'. אותה תבנית כמו מועד א', אבל עם מלכודת נוספת כמעט בכל שאלה. 10 שאלות אמריקאיות, 80 דקות, חומר סגור. התשובות עורבבו, כך שהתשובה הנכונה לא תמיד במקום הראשון. לחצי על אפשרות כדי לראות אם צדקת ולקרוא הסבר.</p>
+  <div class="scorebar">
+    <span>ניקוד: <b id="examB-score">0</b> / 10</span>
+    <div class="progress"><i id="examB-bar"></i></div>
+    <button class="btn ghost" onclick="EXAM_QUIZ['examB'].reset()">איפוס</button>
+  </div>
+  <div id="examB-host"></div>
+  <div class="box key" id="examB-final" style="display:none"></div>
+</section>
+
+<!-- ============ EXAMC ============ -->
+<section class="lesson" id="examC">
+  <h2 class="title">מועד ג' מדומה</h2>
+  <p class="lead">מבחן תרגול שנבנה לפי התבנית של מועדים א' ו-ב', עם וריאציות חדשות. הנחה בכל הקוד: <code>#include &lt;iostream&gt;</code>, <code>#include &lt;typeinfo&gt;</code>, <code>using namespace std;</code>. 10 שאלות אמריקאיות, 80 דקות, חומר סגור. התשובות עורבבו, כך שהתשובה הנכונה לא תמיד במקום הראשון. לחצי על אפשרות כדי לראות אם צדקת ולקרוא הסבר.</p>
+  <div class="scorebar">
+    <span>ניקוד: <b id="examC-score">0</b> / 10</span>
+    <div class="progress"><i id="examC-bar"></i></div>
+    <button class="btn ghost" onclick="EXAM_QUIZ['examC'].reset()">איפוס</button>
+  </div>
+  <div id="examC-host"></div>
+  <div class="box key" id="examC-final" style="display:none"></div>
+</section>
+
 <footer>
   מדריך למידה שנבנה על בסיס הסילבוס וקובץ שאלות התרגול של הקורס "השלמות תכנות מונחה עצמים ב-C++".
   ההסברים נועדו ללימוד עצמי; מומלץ להריץ את הקוד בעצמך כדי לוודא הבנה.
@@ -1443,6 +1486,403 @@ function resetQuiz(){
   render();updateScore();
 }
 render();updateScore();
+
+// ---------- exams (real + mock) ----------
+const EXAMS={
+ examA:[
+{
+"q": "<p>מה יקרה בעת קומפילציה של הקוד הבא?</p><pre><code>class Box {\n    int value;\npublic:\n    Box(int v) : value(v) {}\n};\n\nint main() {\n    Box arr[3];\n}</code></pre>",
+"opts": [
+"הקוד יתקמפל, כי הקומפיילר ייצור אוטומטית בנאי ברירת מחדל",
+"הקוד יתקמפל, אך הערכים של value בשלושת האיברים יהיו לא מאותחלים",
+"תהיה שגיאת קומפילציה, כי אין בנאי ברירת מחדל הדרוש ליצירת איברי המערך",
+"תהיה שגיאת ריצה בלבד, כי arr נוצר על המחסנית ולא על הערימה"
+],
+"ans": 2,
+"exp": "הוגדר בנאי עם פרמטר (<code>Box(int)</code>), ולכן הקומפיילר <b>לא</b> מייצר בנאי ברירת מחדל. יצירת <code>Box arr[3]</code> דורשת בנאי ריק לכל אחד משלושת האיברים, ולכן יש שגיאת קומפילציה. בנאי אוטומטי נוצר רק כשלא הוגדר שום בנאי, ומחסנית מול ערימה לא קשורה לעניין."
+},
+{
+"q": "<p>מה נכון לגבי הרשאות הגישה בקוד הבא?</p><pre><code>class A {\npublic:\n    int x;\nprotected:\n    int y;\nprivate:\n    int z;\n};\n\nclass B : private A {\npublic:\n    void f() {\n        x = 1;\n        y = 2;\n    }\n};\n\nint main() {\n    B b;\n    b.x = 3;\n}</code></pre>",
+"opts": [
+"שתי ההשמות בתוך המתודה תקינות, אבל ההשמה מתוך main אינה תקינה",
+"כל הקוד תקין, כי החבר הרלוונטי הוגדר ציבורי במחלקת הבסיס",
+"המתודה במחלקה היורשת אינה יכולה לגשת לחבר המוגן, כי הוא אינו ציבורי",
+"ההשמה מתוך main תקינה, אבל המתודה במחלקה היורשת אינה יכולה לגשת לחבר הציבורי"
+],
+"ans": 0,
+"exp": "הסבר המרצה: כאשר B יורשת כ private את מחלקה A היא הפכה את החלק ה A-י של כל אובייקט מסוג B ל private. כלומר רק כלפי חוץ החלק הזה באובייקט מסוג B יראה כ private. לכן ב main לא ניתן לבצע השמה ל b.x. כאמור זה \"כלפי חוץ\" ואילו \"כלפי פנים\"  A הוא זה שקבע את ההרשאות שלו  ו B לא יכול לשנות אותן. ולכן אין לו בעיה לאתחל את x,y."
+},
+{
+"q": "<p>איזה תיקון עקרוני נדרש כדי שההשמה בשורה האחרונה תהיה חוקית?</p><pre><code>class Vec3 {\n    int data[3];\npublic:\n    int operator[](int i) const {\n        return data[i];\n    }\n};\n\nint main() {\n    Vec3 v;\n    v[0] = 7;\n}</code></pre>",
+"opts": [
+"להחזיר הפניה קבועה (const int &amp;) מתוך האופרטור הקיים",
+"להפוך את המערך הפנימי לציבורי, כי רק כך ניתן להציב לתא",
+"להגדיר את האופרטור כווירטואלי, כדי שהקריאה תיבחר בזמן ריצה",
+"להוסיף גרסה ללא const של אופרטור הסוגריים המרובעים, שמחזירה הפניה לאיבר (&amp;)"
+],
+"ans": 3,
+"exp": "גרסת ה-const מחזירה <code>int</code> לפי ערך, כלומר עותק זמני, ואי אפשר להציב אליו. כדי ש-<code>v[0] = 7</code> יעבוד צריך גרסה לא-const שמחזירה <code>int&amp;</code> לאיבר עצמו. <code>const int&amp;</code> מאפשרת קריאה בלבד, ו-virtual לא קשור לכאן."
+},
+{
+"q": "<p>נתון הקוד הבא. המערכת צריכה לשמור לקובץ סוגים שונים של עובדים (ומאוחר יותר לטעון אותם), בלי שהקוד ששומר את המערך יצטרך לדעת האם עובד מסוים הוא מנהל, מהנדס, או סוג עובד אחר שיתווסף בעתיד.</p><p>איזה שינוי הוא התכנון המונחה־עצמים הנכון ביותר?</p><pre><code>class Employee {\nprotected:\n    string name;\n    int salary;\n\npublic:\n    void saveCommon() const {\n        cout &lt;&lt; name &lt;&lt; \" \" &lt;&lt; salary &lt;&lt; \" \";\n    }\n};\n\nclass Manager : public Employee {\n    int level;\n\npublic:\n    void saveManager() const {\n        saveCommon();\n        cout &lt;&lt; level &lt;&lt; endl;\n    }\n};\n\nclass Engineer : public Employee {\n    string degree;\n\npublic:\n    void saveEngineer() const {\n        saveCommon();\n        cout &lt;&lt; degree &lt;&lt; endl;\n    }\n};\n\nvoid saveAll(Employee** arr, int size) {\n    for (int i = 0; i &lt; size; i++) {\n        // מה נכון לעשות כאן?\n    }\n}</code></pre>",
+"opts": [
+"להוסיף ל־Employee שדה type ובלולאה לבצע switch על סוג העובד כדי להחליט אם לקרוא ל־saveManager() או ל־saveEngineer().",
+"להגדיר ב־Employee מתודה virtual void save() const, ובכל מחלקה יורשת לדרוס אותה. בתוך save() של המחלקה היורשת שמורים את סוג הטיפוס, קוראים ל־Employee::save(), ואז שומרים את המידע הייחודי לטיפוס המסוים.",
+"בלולאה לבצע dynamic_cast לכל סוג עובד אפשרי, ואם ההמרה הצליחה לקרוא לפונקציית השמירה המתאימה של אותו סוג.",
+"להגדיר ב־Employee מתודה virtual void save() const, ובכל מחלקה יורשת לדרוס אותה. בתוך save() של המחלקה היורשת קוראים תחילה ל־Employee::save(), ואז שומרים את המידע הייחודי."
+],
+"ans": 1,
+"exp": "מתודה וירטואלית <code>save()</code> מאפשרת ל-<code>saveAll</code> לקרוא <code>arr[i]-&gt;save()</code> בלי לדעת את הסוג. הנקודה העדינה היא ההבדל מהתשובה הדומה: יורשת צריכה <b>לשמור קודם את סוג הטיפוס</b>. אחרת, בזמן הטעינה מהקובץ אין דרך לדעת איזה אובייקט ליצור (Manager או Engineer). switch ו-dynamic_cast מחייבים לשנות את הלולאה בכל פעם שמתווסף סוג."
+},
+{
+"q": "<p>מהי הבעיה המהותית בקוד הבא?</p><pre><code>class Base {\npublic:\n    ~Base() { cout &lt;&lt; \"B\"; }\n};\n\nclass Derived : public Base {\n    int* data;\npublic:\n    Derived() : data(new int[10]) {}\n    ~Derived() {\n        delete[] data;\n        cout &lt;&lt; \"D\";\n    }\n};\n\nint main() {\n    Base* p = new Derived();\n    delete p;\n}</code></pre>",
+"opts": [
+"הקוד תקין, כי בזמן ריצה מזוהה שהאובייקט המקורי שייך למחלקה היורשת",
+"הבעיה היחידה היא שחסר בנאי העתקה בגלל השדה שהוקצה דינמית",
+"מחיקה דרך מצביע למחלקת בסיס ללא הורס וירטואלי היא התנהגות לא מוגדרת, ולכן יש להגדיר הורס וירטואלי במחלקת הבסיס",
+"צריך להחליף את פעולת המחיקה החיצונית במחיקת מערך, כי בתוך האובייקט הוקצה מערך"
+],
+"ans": 2,
+"exp": "מחיקה דרך <code>Base*</code> כשההורס של Base לא וירטואלי היא התנהגות לא מוגדרת. בפועל רק <code>~Base</code> ירוץ, ו-<code>delete[] data</code> לא יתבצע. התיקון: <code>virtual ~Base()</code>. ב-<code>delete p</code> החיצוני אין מערך, אז <code>delete[]</code> שגוי שם."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>struct A {\n    A()  { cout &lt;&lt; \"A\"; }\n    ~A() { cout &lt;&lt; \"a\"; }\n};\n\nstruct B {\n    B()  { cout &lt;&lt; \"B\"; }\n    ~B() { cout &lt;&lt; \"b\"; }\n};\n\nstruct M {\n    M()  { cout &lt;&lt; \"M\"; }\n    ~M() { cout &lt;&lt; \"m\"; }\n};\n\nstruct C : public B, public A {\n    M m;\n    C()  { cout &lt;&lt; \"C\"; }\n    ~C() { cout &lt;&lt; \"c\"; }\n};\n\nint main() {\n    C c;\n}</code></pre>",
+"opts": [
+"<code>ABMCcmba</code>",
+"<code>BAMCcmab</code>",
+"<code>BAMCcbam</code>",
+"<code>MABCcmab</code>"
+],
+"ans": 1,
+"exp": "קודם נבנים הבסיסים לפי הסדר ברשימת הירושה: <b>B ואז A</b> (לא לפי הא\"ב). אחר כך השדה <code>M m</code>, ובסוף גוף הבנאי של C. כך מתקבל <code>BAMC</code>. ההריסה בסדר הפוך בדיוק: <code>cmab</code>."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>struct A {\n    A() { cout &lt;&lt; \"A\"; }\n};\n\nstruct B : virtual public A {\n    B() { cout &lt;&lt; \"B\"; }\n};\n\nstruct C : virtual public A {\n    C() { cout &lt;&lt; \"C\"; }\n};\n\nstruct D : public B, public C {\n    D() { cout &lt;&lt; \"D\"; }\n};\n\nint main() {\n    D d;\n}</code></pre>",
+"opts": [
+"<code>ABACD</code>",
+"<code>BACD</code>",
+"<code>AABCD</code>",
+"<code>ABCD</code>"
+],
+"ans": 3,
+"exp": "שני המסלולים יורשים את A כ-<code>virtual</code>, ולכן A נבנה <b>פעם אחת</b> וראשון, על ידי המחלקה הנגזרת ביותר D. אחר כך B, C ו-D, כלומר <code>ABCD</code>. בלי virtual הייתה מתקבלת התוצאה <code>ABACD</code>."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>class Animal {\npublic:\n    virtual ~Animal() {}\n};\n\nclass Dog : public Animal {};\nclass Cat : public Animal {};\n\nint main() {\n    Dog d;\n    Animal* p = &amp;d;\n    cout &lt;&lt; (dynamic_cast&lt;Cat*&gt;(p) == nullptr)\n         &lt;&lt; \" \"\n         &lt;&lt; (typeid(*p) == typeid(Dog));\n}</code></pre>",
+"opts": [
+"<code>1 1</code>",
+"<code>1 0</code>",
+"<code>0 1</code>",
+"<code>0 0</code>"
+],
+"ans": 0,
+"exp": "הסבר המרצה: יש לנו runtime object מסוג DOG ואילו p הוא מצביע מסוג Animal אשר מצביע עליו. כאשר אנו עושים dynamic cast ל cat* אנו בעצם שואלים האם ל runtime object יש לפחות את החלקים Animal ומתחתיו Cat (אגב, מבלי שאיכפת לנו מה יש מתחת ל Cat). היות והאובייקט הוא מסוג Dog ה cast נכשל וחוזר null. השאילתא בודקת האם חוזר null ולכן התשובה היא True כלומר יודפס \"1\". השאילתא השנייה בודקת האם ה typeid של *p היא Dog וזה כמובן נכון משום שתוכן שעליו מצביע p הוא אובייקט מסוג Dog ולכן ההדפסה היא \"1 1\""
+},
+{
+"q": "<p>מה יקרה בעת קומפילציה של הקוד הבא?</p><pre><code>template &lt;class T&gt;\nT smaller(T a, T b) {\n    return (a &lt; b) ? a : b;\n}\n\nint main() {\n    cout &lt;&lt; smaller(3, 2.5);\n}</code></pre>",
+"opts": [
+"הקוד יתקמפל ויודפס 2.5, כי הטיפוס בתבנית ייבחר לפי הארגומנט הרחב יותר",
+"תהיה שגיאת קומפילציה, כי שני הארגומנטים מובילים להסקת שני טיפוסים שונים",
+"הקוד יתקמפל ויודפס 2, כי הטיפוס בתבנית ייקבע לפי הארגומנט הראשון",
+"הקוד יתקמפל רק אם מוסיפים וירטואליות לפני פונקציית התבנית"
+],
+"ans": 1,
+"exp": "שני הפרמטרים הם מאותו <code>T</code>, אבל הארגומנטים הם <code>int</code> (3) ו-<code>double</code> (2.5). הקומפיילר לא ממיר כדי ליישר טיפוסים בהסקה, ולכן יש שגיאת קומפילציה. אין בחירה של \"הטיפוס הרחב\" ואין קביעה לפי הארגומנט הראשון."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>class A {\npublic:\n    A() {\n        cout &lt;&lt; \"A\";\n        throw 1;\n    }\n\n    ~A() {\n        cout &lt;&lt; \"a\";\n    }\n};\n\nint main() {\n    try {\n        A x;\n        cout &lt;&lt; \"X\";\n    }\n    catch (int) {\n        cout &lt;&lt; \"C\";\n    }\n}</code></pre>",
+"opts": [
+"<code>AaC</code>",
+"<code>AXC</code>",
+"<code>AC</code>",
+"<code>A</code>"
+],
+"ans": 2,
+"exp": "הבנאי מדפיס A ואז זורק חריגה. האובייקט <b>לא סיים להיבנות</b>, ולכן ההורס שלו לא נקרא (אין a). השורה <code>cout &lt;&lt; \"X\"</code> לא מתבצעת, וה-catch מדפיס C. סך הכול: <code>AC</code>."
+}
+],
+ examB:[
+{
+"q": "<p>במערכת הבאה רוצים לאפשר הוספת סוגי הודעות חדשים בעתיד, בלי לשנות את הפונקציה sendAll. איזו השלמה מבטאת את התכנון המונחה־עצמים הנכון ביותר?</p><pre><code>class Notification {\npublic:\n    // what should be here?\n};\n\nclass Email : public Notification {\npublic:\n    void send() const { cout &lt;&lt; \"E\"; }\n};\n\nclass Sms : public Notification {\npublic:\n    void send() const { cout &lt;&lt; \"S\"; }\n};\n\nvoid sendAll(Notification** arr, int size) {\n    for (int i = 0; i &lt; size; i++) {\n        arr[i]-&gt;send();\n    }\n}</code></pre>",
+"opts": [
+"להוסיף ל־Notification שדה type, וב־sendAll לבצע switch לפי סוג ההודעה.",
+"להגדיר ב־Notification מתודת send וירטואלית טהורה וקבועה, ולדרוס אותה בכל מחלקה יורשת.",
+"להשאיר את Notification ריקה, וב־sendAll לבצע dynamic_cast לכל סוג הודעה אפשרי.",
+"להפוך את sendAll לפונקציית template, כך שבכל קריאה היא תקבל מערך מסוג הודעה יחיד."
+],
+"ans": 1,
+"exp": "מתודה <code>virtual void send() const = 0</code> ב-Notification מאפשרת ל-<code>sendAll</code> לקרוא <code>arr[i]-&gt;send()</code> דרך מצביע לבסיס. סוג הודעה חדש רק דורס את send, בלי לשנות את sendAll. היא חייבת להיות const כי הגרסאות ביורשות הן const. switch ו-dynamic_cast מחייבים לשנות את sendAll, ו-template לא מאפשר מערך מעורב."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>class Base {\npublic:\n    void f() { cout &lt;&lt; \"Bf\"; }\n    virtual void g() { cout &lt;&lt; \"Bg\"; }\n};\n\nclass Derived : public Base {\npublic:\n    void f() { cout &lt;&lt; \"Df\"; }\n    void g() { cout &lt;&lt; \"Dg\"; }\n};\n\nint main() {\n    Derived d;\n    Base* p = &amp;d;\n    p-&gt;f();\n    p-&gt;g();\n}</code></pre>",
+"opts": [
+"<code>DfDg</code>",
+"<code>BfBg</code>",
+"הקוד לא יתקמפל, כי p הוא מצביע ל־Base ואינו יכול להצביע על Derived.",
+"<code>BfDg</code>"
+],
+"ans": 3,
+"exp": "<code>f</code> לא וירטואלית, ולכן היא נבחרת לפי הטיפוס הסטטי <code>Base*</code> ומודפס Bf. <code>g</code> וירטואלית, ולכן היא נבחרת לפי האובייקט האמיתי (Derived) ומודפס Dg. סך הכול: <code>BfDg</code>. מצביע לבסיס יכול להצביע על אובייקט של יורשת."
+},
+{
+"q": "<p>מה נכון לגבי הרשאות הגישה בקוד הבא?</p><pre><code>class A {\npublic:\n    int x;\nprotected:\n    int y;\nprivate:\n    int z;\n};\n\nclass B : protected A {\npublic:\n    void f() {\n        x = 1;\n        y = 2;\n    }\n};\n\nclass C : public B {\npublic:\n    void g() {\n        x = 3;\n        y = 4;\n    }\n};\n\nint main() {\n    C c;\n    c.x = 5;\n}</code></pre>",
+"opts": [
+"ההשמות בתוך f ובתוך g תקינות, אבל ההשמה מתוך main אינה תקינה.",
+"כל הקוד תקין, כי x הוגדר public במחלקת הבסיס A.",
+"ההשמות בתוך g אינן תקינות, כי ירושה protected מאפשרת גישה רק למחלקה B עצמה.",
+"ההשמה ל־y בתוך f אינה תקינה, כי y אינו public במחלקה A."
+],
+"ans": 0,
+"exp": "בירושת <code>protected</code>, x ו-y הופכים ל-protected בתוך B. לכן גם B וגם C (שיורשת מ-B) יכולות לגשת אליהם, ו-f ו-g תקינות. מבחוץ, ב-main, <code>c.x</code> הוא protected, ולכן יש שגיאת קומפילציה."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>struct A {\n    A() { cout &lt;&lt; \"A\"; }\n    ~A() { cout &lt;&lt; \"a\"; }\n};\n\nstruct B {\n    B() { cout &lt;&lt; \"B\"; }\n    ~B() { cout &lt;&lt; \"b\"; }\n};\n\nstruct X {\n    X() { cout &lt;&lt; \"X\"; }\n    ~X() { cout &lt;&lt; \"x\"; }\n};\n\nstruct Y {\n    Y() { cout &lt;&lt; \"Y\"; }\n    ~Y() { cout &lt;&lt; \"y\"; }\n};\n\nstruct C : public A, public B {\n    Y y;\n    X x;\n    C() { cout &lt;&lt; \"C\"; }\n    ~C() { cout &lt;&lt; \"c\"; }\n};\n\nint main() {\n    C obj;\n}</code></pre>",
+"opts": [
+"<code>ABXYCcyxba</code>",
+"<code>BAYXCcxyab</code>",
+"<code>ABYXCcxyba</code>",
+"<code>ABYXCcyxba</code>"
+],
+"ans": 2,
+"exp": "קודם הבסיסים לפי רשימת הירושה (A, B), אחר כך השדות לפי <b>סדר ההצהרה</b> (Y ואז X), ובסוף C. כך מתקבל <code>ABYXC</code>. ההריסה בסדר הפוך בדיוק: <code>cxyba</code>."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>struct A {\n    A() { cout &lt;&lt; \"A\"; }\n};\n\nstruct B : virtual public A {\n    B() { cout &lt;&lt; \"B\"; }\n};\n\nstruct C : public A {\n    C() { cout &lt;&lt; \"C\"; }\n};\n\nstruct D : public B, public C {\n    D() { cout &lt;&lt; \"D\"; }\n};\n\nint main() {\n    D d;\n}</code></pre>",
+"opts": [
+"<code>ABCD</code>",
+"<code>AABCD</code>",
+"<code>BACD</code>",
+"<code>ABACD</code>"
+],
+"ans": 3,
+"exp": "רק B יורשת את A כ-virtual, ו-C יורשת אותו כרגיל. A הווירטואלי נבנה ראשון על ידי D, אחר כך B, ואז C, שיש לה <b>עותק משלה</b> של A, ולכן מודפס שוב A ואחריו C. בסוף D. סך הכול: <code>ABACD</code>."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא? (כזכור 1 זה true ואילו 0 זה false, ההדפסות הן משמאל לימין)</p><pre><code>class Animal {\npublic:\n    virtual ~Animal() {}\n};\n\nclass Dog : public Animal {};\nclass Bulldog : public Dog {};\nclass Cat : public Animal {};\n\nint main() {\n    Bulldog b;\n    Animal&amp; r = b;\n    cout &lt;&lt; (dynamic_cast&lt;Dog*&gt;(&amp;r) != nullptr) &lt;&lt; \" \"\n         &lt;&lt; (typeid(r) == typeid(Dog)) &lt;&lt; \" \"\n         &lt;&lt; (typeid(r) == typeid(Bulldog));\n}</code></pre>",
+"opts": [
+"<code>1 0 1</code>",
+"<code>1 1 0</code>",
+"<code>0 0 1</code>",
+"<code>1 1 1</code>"
+],
+"ans": 0,
+"exp": "האובייקט הוא Bulldog. <code>dynamic_cast&lt;Dog*&gt;</code> מצליח, כי Bulldog הוא Dog, ומתקבל 1. <code>typeid</code> על הפניה לאובייקט פולימורפי מחזיר את הטיפוס <b>המדויק</b> בזמן ריצה, Bulldog. לכן ההשוואה ל-Dog נותנת 0, וההשוואה ל-Bulldog נותנת 1. סך הכול: <code>1 0 1</code>."
+},
+{
+"q": "<p>מהי הבעיה המהותית בקוד הבא?</p><pre><code>class Buffer {\n    int* data;\npublic:\n    Buffer(int v) : data(new int(v)) {}\n    ~Buffer() { delete data; }\n};\n\nint main() {\n    Buffer a(5);\n    Buffer b = a;\n}</code></pre>",
+"opts": [
+"הקוד אינו תקין רק משום שחסר בנאי ברירת מחדל למחלקה Buffer.",
+"הבעיה היא שההורס אינו וירטואלי, ולכן לא ייקרא בעת מחיקת אובייקט דרך מצביע למחלקת בסיס.",
+"העתקת ברירת המחדל תעתיק את המצביע בלבד, ולכן שני אובייקטים ינסו למחוק את אותו הזיכרון.",
+"יש להשתמש במחיקת מערך במקום במחיקה רגילה, כי data הוא מצביע."
+],
+"ans": 2,
+"exp": "אין בנאי העתקה, ולכן <code>Buffer b = a</code> מעתיק רק את המצביע (העתקה רדודה). בסוף main שני ההורסים מוחקים את אותו זיכרון, וזו מחיקה כפולה. התיקון הוא Rule of Three: בנאי העתקה, אופרטור השמה והורס."
+},
+{
+"q": "<p>איזו חתימה היא המתאימה ביותר למימוש האופרטור + עבור המחלקה הבאה, אם רוצים שהפעולה לא תשנה את האובייקט השמאלי ותחזיר נקודה חדשה?</p><pre><code>class Point {\n    int x, y;\npublic:\n    Point(int ax = 0, int ay = 0) : x(ax), y(ay) {}\n    // operator+ is missing\n};\n\nint main() {\n    Point a(1, 2), b(3, 4);\n    Point c = a + b;\n}</code></pre>",
+"opts": [
+"<code>Point&amp; operator+(const Point&amp; other) const;</code>",
+"<code>Point operator+(const Point&amp; other) const;</code>",
+"<code>void operator+(Point other);</code>",
+"<code>virtual Point operator+(Point* other);</code>"
+],
+"ans": 1,
+"exp": "האופרטור לא משנה את האובייקט השמאלי, ולכן הוא <code>const</code>. הוא מקבל את הימני כ-<code>const Point&amp;</code> ומחזיר נקודה חדשה <b>לפי ערך</b>. החזרת <code>Point&amp;</code> הייתה מחזירה הפניה למשתנה מקומי שכבר נהרס, ו-void לא מחזיר כלום."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>template &lt;class T, class U&gt;\nT choose(T a, U b) {\n    return (a &lt; b) ? a : b;\n}\n\nint main() {\n    cout &lt;&lt; choose(3, 2.5);\n}</code></pre>",
+"opts": [
+"<code>2</code>",
+"<code>2.5</code>",
+"<code>3</code>",
+"תהיה שגיאת קומפילציה, כי שני הארגומנטים הם מטיפוסים שונים."
+],
+"ans": 0,
+"exp": "כאן יש שני פרמטרי תבנית, ולכן ההסקה תקינה: <code>T=int</code>, <code>U=double</code>. <code>3 &lt; 2.5</code> שקרי, ולכן מוחזר b (2.5). אבל טיפוס ההחזרה הוא <code>T</code>, כלומר int, ולכן הערך נחתך ל-<code>2</code>."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>struct A {\n    A() { cout &lt;&lt; \"A\"; }\n    ~A() { cout &lt;&lt; \"a\"; }\n};\n\nstruct B {\n    B() {\n        cout &lt;&lt; \"B\";\n        throw 1;\n    }\n    ~B() { cout &lt;&lt; \"b\"; }\n};\n\nint main() {\n    try {\n        A a;\n        B b;\n        cout &lt;&lt; \"X\";\n    }\n    catch (int) {\n        cout &lt;&lt; \"C\";\n    }\n}</code></pre>",
+"opts": [
+"<code>ABbaC</code>",
+"<code>ABC</code>",
+"<code>ABXC</code>",
+"<code>ABaC</code>"
+],
+"ans": 3,
+"exp": "a נבנה (A). הבנאי של B מדפיס B וזורק. b לא סיים להיבנות, ולכן <b>אין</b> b. ביציאה מבלוק ה-try נהרס a, שנבנה במלואו, ומודפס a. אחר כך ה-catch מדפיס C. סך הכול: <code>ABaC</code>."
+}
+],
+ examC:[
+{
+"q": "<p>נתון הקוד הבא. רוצים שהפונקציה <code>totalArea</code> תחשב את סכום השטחים של כל הצורות במערך, ושאפשר יהיה להוסיף בעתיד צורות חדשות (למשל משולש) בלי לשנות את <code>totalArea</code>.</p><p>איזה שינוי הוא התכנון המונחה־עצמים הנכון ביותר?</p><pre><code>class Shape {\npublic:\n    // what should be here?\n};\n\nclass Circle : public Shape {\n    double r;\npublic:\n    Circle(double r) : r(r) {}\n    double circleArea() const { return 3.14 * r * r; }\n};\n\nclass Rect : public Shape {\n    double w, h;\npublic:\n    Rect(double w, double h) : w(w), h(h) {}\n    double rectArea() const { return w * h; }\n};\n\ndouble totalArea(Shape** arr, int size) {\n    double sum = 0;\n    for (int i = 0; i &lt; size; i++) {\n        // what should be here?\n    }\n    return sum;\n}</code></pre>",
+"opts": [
+"להוסיף ל־Shape שדה <code>type</code>, ובלולאה לבצע <code>switch</code> על הסוג כדי לקרוא ל־<code>circleArea()</code> או ל־<code>rectArea()</code>.",
+"בלולאה לבצע <code>dynamic_cast</code> ל־<code>Circle*</code> ול־<code>Rect*</code>, ולקרוא לפונקציה המתאימה לפי ההמרה שהצליחה.",
+"להגדיר ב־Shape מתודה <code>virtual double area() const = 0</code>, לדרוס אותה בכל מחלקה יורשת, ובלולאה לבצע <code>sum += arr[i]-&gt;area()</code>.",
+"להפוך את <code>totalArea</code> לפונקציית template, כך שכל קריאה תקבל מערך של צורות מסוג אחד בלבד."
+],
+"ans": 2,
+"exp": "מתודה וירטואלית טהורה משאירה את <code>totalArea</code> עובדת דרך <code>Shape*</code> בלבד, וצורה חדשה רק דורסת את <code>area()</code>. ב־switch וב־dynamic_cast צריך לשנות את הלולאה בכל פעם שמוסיפים צורה, וזה בדיוק מה שרצינו למנוע. (אם מוחקים צורות דרך <code>Shape*</code>, צריך גם הורס וירטואלי ב־Shape.)"
+},
+{
+"q": "<p>מה נכון לגבי הקוד הבא?</p><pre><code>class A {\npublic:\n    int x;\nprotected:\n    int y;\nprivate:\n    int z;\n};\n\nclass B : private A {\npublic:\n    void f() {\n        x = 1;\n        y = 2;\n    }\n};\n\nclass C : public B {\npublic:\n    void g() {\n        x = 3;\n    }\n};\n\nint main() {\n    B b;\n    b.f();\n}</code></pre>",
+"opts": [
+"כל הקוד תקין, כי C יורשת את B כ־public, ו־x הוגדר public במחלקה A.",
+"ההשמות בתוך f תקינות, אבל ההשמה בתוך g אינה תקינה, כי בתוך B החלק של A הפך ל־private.",
+"גם ההשמות בתוך f וגם ההשמה בתוך g אינן תקינות, כי בירושת private אין גישה לחברי מחלקת הבסיס.",
+"רק ההשמה ל־y בתוך f אינה תקינה, כי y מוגדר protected ב־A."
+],
+"ans": 1,
+"exp": "בתוך B הגישה ל־x ול־y נקבעת לפי ההרשאות ב־A (public ו־protected), ולכן f תקינה. אבל B יורשת את A כ־private, אז מבחינת כל מי שבא אחרי B (כולל C שיורשת ממנה) החלק של A הוא private. לכן <code>x = 3</code> בתוך g היא שגיאת קומפילציה. זה ההבדל ממועד ב', שם הירושה הייתה protected ו־g כן הייתה תקינה."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>struct A { A() { cout &lt;&lt; \"A\"; } ~A() { cout &lt;&lt; \"a\"; } };\nstruct B { B() { cout &lt;&lt; \"B\"; } ~B() { cout &lt;&lt; \"b\"; } };\nstruct X { X() { cout &lt;&lt; \"X\"; } ~X() { cout &lt;&lt; \"x\"; } };\nstruct Y { Y() { cout &lt;&lt; \"Y\"; } ~Y() { cout &lt;&lt; \"y\"; } };\n\nstruct C : public B, public A {\n    X x;\n    Y y;\n    C() : y(), x() { cout &lt;&lt; \"C\"; }\n    ~C() { cout &lt;&lt; \"c\"; }\n};\n\nint main() {\n    C obj;\n}</code></pre>",
+"opts": [
+"<code>BAYXCcxyab</code>",
+"<code>ABXYCcyxba</code>",
+"<code>BAXYCcxyab</code>",
+"<code>BAXYCcyxab</code>"
+],
+"ans": 3,
+"exp": "קודם נבנים הבסיסים לפי הסדר ברשימת הירושה (B, A), אחר כך השדות לפי סדר ההצהרה במחלקה (X, Y), ובסוף גוף הבנאי (C). רשימת האתחול <code>: y(), x()</code> לא משנה את הסדר. זו המלכודת, ומסיח א' מבוסס עליה. ההריסה בסדר הפוך בדיוק: <code>c y x a b</code>."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>struct A {\n    A() { cout &lt;&lt; \"A\"; }\n};\n\nstruct B : virtual public A {\n    B() { cout &lt;&lt; \"B\"; }\n};\n\nstruct C : virtual public A {\n    C() { cout &lt;&lt; \"C\"; }\n};\n\nstruct D : public C, public B {\n    D() { cout &lt;&lt; \"D\"; }\n};\n\nint main() {\n    D d;\n}</code></pre>",
+"opts": [
+"<code>ACBD</code>",
+"<code>ABCD</code>",
+"<code>ACABD</code>",
+"<code>CABD</code>"
+],
+"ans": 0,
+"exp": "בסיס וירטואלי נבנה פעם אחת ולפני כולם, על ידי המחלקה הנגזרת ביותר (A). אחר כך הבסיסים הישירים לפי הסדר ברשימת הירושה של D, והוא <code>C, B</code> ולא B, C. ובסוף D. כאן שני המסלולים וירטואליים, ולכן A מופיע פעם אחת בלבד."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא? (1 הוא true ו־0 הוא false, ההדפסות משמאל לימין)</p><pre><code>class Animal {\npublic:\n    virtual ~Animal() {}\n};\n\nclass Dog : public Animal {};\nclass Puppy : public Dog {};\nclass Cat : public Animal {};\n\nint main() {\n    Dog d;\n    Animal* p = &amp;d;\n    cout &lt;&lt; (dynamic_cast&lt;Puppy*&gt;(p) != nullptr) &lt;&lt; \" \"\n         &lt;&lt; (typeid(*p) == typeid(Dog)) &lt;&lt; \" \"\n         &lt;&lt; (typeid(p) == typeid(Animal*));\n}</code></pre>",
+"opts": [
+"<code>1 1 1</code>",
+"<code>0 1 0</code>",
+"<code>0 1 1</code>",
+"<code>0 0 1</code>"
+],
+"ans": 2,
+"exp": "האובייקט בזמן ריצה הוא Dog. ההמרה ל־<code>Puppy*</code> נכשלת, כי Dog הוא לא Puppy (מחלקת בת), ולכן ההשוואה ל־nullptr נותנת 0. <code>typeid(*p)</code> מחזיר את הטיפוס בזמן ריצה, Dog, ולכן 1. <code>typeid(p)</code> בלי כוכבית בודק את המצביע עצמו, שהטיפוס הסטטי שלו הוא <code>Animal*</code>, ולכן גם כאן 1."
+},
+{
+"q": "<p>מה יקרה בהרצת הקוד הבא?</p><pre><code>template &lt;class T&gt;\nT biggest(T a, T b) {\n    return (a &gt; b) ? a : b;\n}\n\nint main() {\n    cout &lt;&lt; biggest&lt;int&gt;(3, 4.7);\n}</code></pre>",
+"opts": [
+"יודפס <code>4.7</code>, כי הערך הגדול יותר מוחזר כמו שהוא.",
+"יודפס <code>4</code>, כי T נקבע במפורש ל־int, ולכן 4.7 מומר ל־4 עוד לפני ההשוואה.",
+"תהיה שגיאת קומפילציה, כי שני הארגומנטים מובילים להסקת שני טיפוסים שונים.",
+"יודפס <code>3</code>, כי הטיפוס נקבע לפי הארגומנט הראשון והשני מתעלם."
+],
+"ans": 1,
+"exp": "כש־T נקבע במפורש (<code>&lt;int&gt;</code>) אין הסקת טיפוסים, ולכן גם אין שגיאה. 4.7 מומר ל־int (נחתך ל־4) כבר בהעברת הפרמטר, ואז <code>3 &gt; 4</code> הוא false ומוחזר 4. בלי <code>&lt;int&gt;</code> הייתה שגיאת קומפילציה, כמו במועד א'."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>struct A { A() { cout &lt;&lt; \"A\"; } ~A() { cout &lt;&lt; \"a\"; } };\nstruct B { B() { cout &lt;&lt; \"B\"; } ~B() { cout &lt;&lt; \"b\"; } };\n\nstruct C {\n    C() {\n        cout &lt;&lt; \"C\";\n        throw 1;\n    }\n    ~C() { cout &lt;&lt; \"c\"; }\n};\n\nint main() {\n    try {\n        A a;\n        B b;\n        C c;\n        cout &lt;&lt; \"X\";\n    }\n    catch (int) {\n        cout &lt;&lt; \"E\";\n    }\n}</code></pre>",
+"opts": [
+"<code>ABCcbaE</code>",
+"<code>ABCabE</code>",
+"<code>ABCE</code>",
+"<code>ABCbaE</code>"
+],
+"ans": 3,
+"exp": "a ו־b נבנו במלואם, ולכן כשהחריגה יוצאת מהבלוק ההורסים שלהם נקראים בסדר הפוך (b ואז a). c לא סיים להיבנות, אז ההורס שלו לא נקרא. X לא מודפס, כי השורה הזו לא מתבצעת."
+},
+{
+"q": "<p>מהי הבעיה המהותית בקוד הבא?</p><pre><code>class Buffer {\n    int* data;\npublic:\n    Buffer(int v) : data(new int(v)) {}\n    Buffer(const Buffer&amp; o) : data(new int(*o.data)) {}\n    ~Buffer() { delete data; }\n};\n\nint main() {\n    Buffer a(5);\n    Buffer b(7);\n    b = a;\n}</code></pre>",
+"opts": [
+"חסר <code>operator=</code>, ולכן ההשמה של ברירת המחדל מעתיקה רק את המצביע: הזיכרון המקורי של b דולף, ובסוף שני האובייקטים מוחקים את אותו הזיכרון.",
+"אין בעיה, כי בשורה <code>b = a</code> ייקרא בנאי ההעתקה שהוגדר, והוא מבצע העתקה עמוקה.",
+"ההורס חייב להיות וירטואלי, אחרת הוא לא ייקרא בסוף <code>main</code>.",
+"צריך להחליף את <code>delete data</code> ב־<code>delete[] data</code>, כי data הוא מצביע."
+],
+"ans": 0,
+"exp": "הוגדרו הורס ובנאי העתקה, אבל לא אופרטור השמה. <code>b = a</code> היא השמה ולא אתחול, ולכן נקרא <code>operator=</code> של ברירת המחדל, שמעתיק רק את המצביע. התוצאה: הזיכרון של 7 דולף, ובסוף <code>main</code> שני ההורסים מוחקים את אותו הבלוק, וזו מחיקה כפולה. בנאי העתקה נקרא רק ביצירת אובייקט חדש (<code>Buffer b = a;</code>)."
+},
+{
+"q": "<p>רוצים שהקוד ב־main יתקמפל וידפיס <code>(1,2) (3,4)</code>. איזו הצהרה בתוך המחלקה Point היא המתאימה ביותר?</p><pre><code>class Point {\n    int x, y;\npublic:\n    Point(int ax = 0, int ay = 0) : x(ax), y(ay) {}\n    // declaration is missing\n};\n\n// ... implementation outside the class ...\n\nint main() {\n    Point a(1, 2), b(3, 4);\n    cout &lt;&lt; a &lt;&lt; \" \" &lt;&lt; b &lt;&lt; endl;\n}</code></pre>",
+"opts": [
+"<code>ostream&amp; operator&lt;&lt;(ostream&amp; os) const;</code>",
+"<code>friend void operator&lt;&lt;(ostream os, Point p);</code>",
+"<code>friend ostream&amp; operator&lt;&lt;(ostream&amp; os, const Point&amp; p);</code>",
+"<code>friend ostream operator&lt;&lt;(ostream&amp; os, const Point&amp; p);</code>"
+],
+"ans": 2,
+"exp": "האופרנד השמאלי הוא <code>cout</code>, ולכן האופרטור לא יכול להיות מתודה של Point. מתודה כמו בתשובה א' הייתה מאפשרת רק <code>a &lt;&lt; cout</code>. הוא מוגדר כפונקציה חיצונית, ו־friend כדי לגשת ל־x ול־y. מקבלים <code>ostream&amp;</code>, כי אי אפשר להעתיק ostream, ולכן גם ב' לא מתקמפלת. מחזירים <code>ostream&amp;</code> כדי לאפשר שרשור <code>cout &lt;&lt; a &lt;&lt; \" \" &lt;&lt; b</code>, ולכן גם ד' לא מתקמפלת."
+},
+{
+"q": "<p>מה יודפס בהרצת הקוד הבא?</p><pre><code>class Base {\npublic:\n    virtual void show() const { cout &lt;&lt; \"B\"; }\n    virtual ~Base() {}\n};\n\nclass Derived : public Base {\npublic:\n    void show() const override { cout &lt;&lt; \"D\"; }\n};\n\nvoid byVal(Base b)        { b.show(); }\nvoid byRef(const Base&amp; b) { b.show(); }\n\nint main() {\n    Derived d;\n    Base* p = &amp;d;\n    byVal(d);\n    byRef(d);\n    p-&gt;show();\n    p-&gt;Base::show();\n}</code></pre>",
+"opts": [
+"<code>DDDB</code>",
+"<code>BDDB</code>",
+"<code>BDDD</code>",
+"<code>DDDD</code>"
+],
+"ans": 1,
+"exp": "<code>byVal</code> מקבלת Base לפי ערך, ולכן נוצר עותק שהוא רק Base (slicing) ויודפס B. <code>byRef</code> ו־<code>p-&gt;show()</code> עובדים דרך הפניה ומצביע, ולכן הקישור דינמי ויודפס D. <code>p-&gt;Base::show()</code> קורא במפורש לגרסת הבסיס ועוקף את המנגנון הווירטואלי, ולכן B."
+}
+]
+};
+
+const EXAM_QUIZ={};
+function mountExam(id){
+  const QS=EXAMS[id], hostEl=document.getElementById(id+'-host');
+  let answered, score;
+  function render(){
+    answered=new Array(QS.length).fill(false); score=0;
+    hostEl.innerHTML='';
+    QS.forEach((item,qi)=>{
+      const card=document.createElement('div');card.className='q';
+      card.innerHTML='<div class="qnum">שאלה '+(qi+1)+'</div><div class="qtext">'+item.q+'</div>';
+      item.opts.forEach((o,oi)=>{
+        const el=document.createElement('div');el.className='opt';
+        el.innerHTML='<span class="letter">'+letters[oi]+'.</span>'+o;
+        el.onclick=()=>choose(qi,oi,card);
+        card.appendChild(el);
+      });
+      const ex=document.createElement('div');ex.className='explain';
+      ex.innerHTML='<span class="ans">התשובה הנכונה: '+letters[item.ans]+'</span><br>'+item.exp;
+      card.appendChild(ex);
+      hostEl.appendChild(card);
+    });
+    document.getElementById(id+'-final').style.display='none';
+    update();
+  }
+  function choose(qi,oi,card){
+    if(answered[qi])return;
+    answered[qi]=true;
+    card.querySelectorAll('.opt').forEach((el,i)=>{
+      el.style.cursor='default';
+      if(i===QS[qi].ans)el.classList.add('correct');
+      else if(i===oi)el.classList.add('wrong');
+    });
+    card.querySelector('.explain').classList.add('show');
+    if(oi===QS[qi].ans)score++;
+    update();
+  }
+  function update(){
+    document.getElementById(id+'-score').textContent=score;
+    const done=answered.filter(Boolean).length;
+    document.getElementById(id+'-bar').style.width=(done/QS.length*100)+'%';
+    if(done===QS.length){
+      const fm=document.getElementById(id+'-final');
+      let msg;
+      if(score>=9)msg='מצוין! '+score+'/10. את מוכנה למבחן. 💪';
+      else if(score>=7)msg='יפה מאוד! '+score+'/10. קראי שוב את ההסברים של השאלות שטעית בהן.';
+      else if(score>=5)msg='בסיס טוב: '+score+'/10. חזרי על המודולים של השאלות שטעית בהן, ואז נסי שוב (כפתור איפוס).';
+      else msg='התחלה: '+score+'/10. עברי שוב על המודולים 5–8 וחזרי למבחן. זה יגיע!';
+      fm.innerHTML='<span class="label">סיימת את המבחן</span>'+msg;
+      fm.style.display='block';
+      fm.scrollIntoView({behavior:'smooth'});
+    }
+  }
+  EXAM_QUIZ[id]={reset:render};
+  render();
+}
+['examA','examB','examC'].forEach(mountExam);
 </script>
 </body>
 </html>
