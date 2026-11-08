@@ -1228,14 +1228,16 @@ maxT&lt;<span class="tok-key">int</span>&gt;(<span class="tok-num">3</span>, <sp
   <pre><code><span class="tok-com">// כתיבה לקובץ</span>
 <span class="tok-type">ofstream</span> out(<span class="tok-str">"data.txt"</span>);
 <span class="tok-key">if</span> (out.<span class="tok-fn">is_open</span>()) {
-    out &lt;&lt; <span class="tok-str">"Hello"</span> &lt;&lt; <span class="tok-num">42</span> &lt;&lt; endl;
+    out &lt;&lt; <span class="tok-str">"Hello"</span> &lt;&lt; <span class="tok-str">" "</span> &lt;&lt; <span class="tok-num">42</span> &lt;&lt; endl;   <span class="tok-com">// בקובץ: Hello 42</span>
     out.<span class="tok-fn">close</span>();
 }
 
 <span class="tok-com">// קריאה מקובץ</span>
 <span class="tok-type">ifstream</span> in(<span class="tok-str">"data.txt"</span>);
 <span class="tok-type">string</span> word; <span class="tok-key">int</span> n;
-in &gt;&gt; word &gt;&gt; n;</code></pre>
+in &gt;&gt; word &gt;&gt; n;   <span class="tok-com">// word = "Hello",  n = 42</span></code></pre>
+  <div class="box trap"><span class="label">מלכודת: בלי מפריד, הקריאה נכשלת</span>
+  ‎<code>&lt;&lt;</code> כותב את הערכים <b>צמודים</b>, בלי רווח. אילו היינו כותבים <code>out &lt;&lt; "Hello" &lt;&lt; 42</code>, בקובץ הייתה נכתבת השורה <code>Hello42</code>. אז <code>in &gt;&gt; word</code>, שקורא מחרוזת עד הרווח הבא, היה מכניס ל-word את <code>"Hello42"</code> כולו. הקריאה ל-<code>n</code> הייתה <b>נכשלת</b>, כי לא נשאר מספר לקרוא: הזרם עובר למצב כישלון (<code>in.fail()</code> מחזיר true), ו-<code>n</code> נשאר <b>לא מאותחל</b>. הכלל: מה שכותבים עם <code>&lt;&lt;</code> צריך מפרידים (רווח או ירידת שורה) כדי שאפשר יהיה לקרוא אותו בחזרה עם <code>&gt;&gt;</code>. בקובץ בינארי, שבו אין מפריד, שומרים את האורך קודם, כמו שמוסבר בהמשך המודול.</div>
 
   <h3>אותם אופרטורים כמו במסך</h3>
   <p>מכיוון ש-<code>ofstream</code> יורש מ-<code>ostream</code>, אותו <code>operator&lt;&lt;</code> שכתבנו למחלקה (מודול 3) עובד גם לכתיבה לקובץ. זה היופי של הירושה בזרמים.</p>
